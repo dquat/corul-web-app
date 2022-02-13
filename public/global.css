@@ -1,0 +1,120 @@
+/* Font imports */
+/* Default font: Lato */
+@import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap');
+
+/* Root settings & variables */
+:root {
+    /* Default font styles */
+    --ff-default     : 'Lato', sans-serif, serif, monospace;
+    --fs-default     : clamp(12px, 1.3vw, 24px);
+    --fw-default     : 500;
+    --lh-default     : 1.5;
+}
+
+/*******************************************
+ |                 Resets                  |
+ *******************************************/
+/* Box sizing */
+*, *::after, *::before {
+    box-sizing : border-box;
+}
+
+/* Set core body defaults */
+body {
+    /* min-height     : 100vh; */ /* Quite annoying with margins, so just remove it for now */
+    margin         : 0;
+    text-rendering : optimizeSpeed;
+    line-height    : var(--lh-default);
+    font-family    : var(--ff-default);
+    font-size      : var(--fs-default);
+    font-weight    : var(--fw-default);
+}
+/* Remove margins from html */
+html {
+    margin : 0;
+}
+
+/* Get rid of default margins */
+/*
+body, h1, h2, h3, h4, h5, h6, p {
+    margin : 0;
+}
+*/
+
+/* Turn on smooth scroll */
+html:focus-within {
+    scroll-behavior : smooth;
+}
+
+/* Make text decoration for links look better */
+a:not([class]) {
+    text-decoration-skip-ink : auto;
+}
+
+/* Inherit fonts for inputs and buttons */
+input, button, textarea, select {
+    font : inherit;
+}
+
+/* Make images easier to work with */
+img, picture {
+    margin    : 0;
+    max-width : 100%;
+    display   : block;
+}
+
+/* Remove animations & smooth scroll when reduced motion is enabled */
+@media (prefers-reduced-motion : reduce) {
+    html:focus-within {
+        scroll-behavior : auto;
+    }
+
+    *, *::before, *::after {
+        animation-duration        : 0.01ms !important;
+        animation-iteration-count : 1      !important;
+        transition-duration       : 0.01ms !important;
+        scroll-behavior           : auto   !important;
+    }
+}
+
+/*******************************************
+ |                Utility                  |
+ *******************************************/
+
+.flex {
+    display : flex;
+    gap     : var(--gap, 1rem);
+}
+
+.grid {
+    display : grid;
+    gap     : var(--gap, 1rem);
+}
+
+.container {
+    padding-inline : 2rem;
+    margin-inline  : auto;
+    max-width      : var(--max-container-width, 100vw);
+}
+
+/* For screen readers */
+.sr-only {
+    position       : absolute;
+    width          : 1px;
+    height         : 1px;
+    overflow       : hidden;
+    clip           : rect(0, 0, 0, 0);
+    padding        : 0;
+    margin         : -1px;
+    white-space    : nowrap;
+    border         : 0;
+    pointer-events : none;
+}
+
+h1 {
+    color         : grey;
+    background    : whitesmoke;
+    border-radius : 10px;
+    padding       : 10px;
+    box-shadow    : rgba(0, 0, 0, 0.2) 0 0 10px 10px;
+}
