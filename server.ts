@@ -1,7 +1,7 @@
-import { Application, Router, RouteParams, RouterContext } from "https://deno.land/x/oak@v9.0.1/mod.ts";
+import { Application, Router, RouterContext, Context } from "https://deno.land/x/oak/mod.ts";
 const app = new Application();
 
-app.addEventListener("listen", ({ hostname, port, secure }) => {
+app.addEventListener("listen", ({ hostname , port, secure }) => {
    console.log(
        `listening on ${
            secure ? 'https://' : 'http://'
@@ -11,7 +11,7 @@ app.addEventListener("listen", ({ hostname, port, secure }) => {
    );
 });
 
-app.use(async (ctx, next) => {
+app.use(async (ctx: Context, next) => {
     try {
         await ctx.send({
             root: `${Deno.cwd()}/public`,
@@ -39,7 +39,7 @@ const router =
 app.use(router.routes());
 app.use(router.allowedMethods());
 
-app.use(async ctx => {
+app.use(async (ctx: Context) => {
     const not_found = await Deno.readFile("./404.html");
     ctx.response.headers =
         new Headers({

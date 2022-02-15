@@ -78,5 +78,5 @@ class TextEditor {
 }
 
 const code = document.querySelector('.editor');
-const text_ed = new TextEditor(code, { caret_class: 'caret', line_class: null });
+const text_ed = new TextEditor(code);
 text_ed.run();
