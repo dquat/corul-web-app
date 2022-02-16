@@ -75,6 +75,7 @@
     position         : absolute;
     height           : var(--caret-height);
     transition       : opacity 0.05s ease;
+    pointer-events   : none;
 }
 
 .caret-blink {
@@ -93,4 +94,15 @@
     overflow          : hidden;
     text-overflow     : ellipsis;
     left              : 0;
+    z-index           : 1;
+}
+
+.line-focus:after {
+    content          : "";
+    left             : 0;
+    position         : absolute;
+    width            : 100%;
+    height           : calc(var(--lh-default) * var(--fs-code)) /* TODO: figure out a better way to calculate height */;
+    pointer-events   : none;
+    background-color : rgba(0 0 0 / 0.15);
 }
