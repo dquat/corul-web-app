@@ -1,5 +1,11 @@
 // last 2 are depreciated, but if e is null, they can be used instead
 const get_e = e => e || window.event || event;
+const resolve_target = e => {
+    const target = e.target instanceof HTMLElement ? e.target : e.target?.parentElement;
+    if (!target)
+        throw "Could not find event target element!";
+    return target;
+}
 
 const TEParams =  {
     caret_class    : 'caret',
@@ -46,7 +52,8 @@ class TextEditor {
 
     get_closest_ln(e) {
         const cy = e.clientY || e.pageY || e.screenY;
-        let closest = e.target.closest(this.line_class);
+        const target = resolve_target(e);
+        let closest = target.closest(this.line_class);
         if (!closest)
             for (const ln of this.lines) {
                 const top = ln.getBoundingClientRect().top;
@@ -74,32 +81,35 @@ class TextEditor {
                 ln.classList.remove(this.line_focused);
     }
 
-    move_caret(_e) {
-        const e       = get_e(_e),
-              closest = this.get_closest_ln(e);
-        if (closest) {
-            const bc = closest.getBoundingClientRect();
-            const [ top, left ] = [ bc.top, bc.left ];
-            this.caret.style.top = `${top}px`;
-            // use set timeout because selection api sucks and, selection does
-            // not get registered directly during mousedown
-            setTimeout(() => {
-                const sel = window.getSelection();
-                if (sel) {
-                    const node   = sel.anchorNode,
-                          offset = sel.anchorOffset;
-                    if (node) {
-                        let range = document.createRange();
-                        range.setStart(node, offset);
-                        range.setEnd  (node, offset);
-                        this.set_curr_line(node.parentElement?.closest(this.line_class));
-                        this.caret.style.left = range.getBoundingClientRect().left + "px";
-                    }
-                } else {
-                    this.caret.style.left = `${left}px`;
+    update_selection(e) {
+        const sel = window.getSelection();
+        if (sel) {
+            const node   = sel.anchorNode,
+                  offset = sel.anchorOffset;
+            if (node) {
+                let range = document.createRange();
+                range.setStart(node, offset);
+                range.setEnd  (node, offset);
+                this.set_curr_line(node.parentElement?.closest(this.line_class));
+                const bc = range.getBoundingClientRect();
+                this.caret.style.left = `${bc.left}px`;
+                this.caret.style.top  = `${bc.top }px`;
+            } else {
+                const closest = this.get_closest_ln(e);
+                if (closest) {
+                    const bc = closest.getBoundingClientRect();
+                    this.caret.style.left = `${bc.left}px`;
+                    this.caret.style.top  = `${bc.top }px`;
                 }
-            }, 1);
+            }
         }
+    }
+
+    move_caret(_e) {
+        const e = get_e(_e)
+        // use set timeout because selection api sucks and, selection does
+        // not get registered directly during mousedown
+        setTimeout(() => this.update_selection(e), 1);
     }
 
     update_line_height() {
@@ -120,7 +130,8 @@ class TextEditor {
 
     toggle_focus(_e) {
         const e = get_e(_e);
-        if (e.target.closest(this.editor_class)) {
+        const target = resolve_target(e);
+        if (target.closest(this.editor_class)) {
             this.el.classList.add(this.focus_class);
             this.focus_events(true);
         } else {
@@ -131,8 +142,15 @@ class TextEditor {
 
     run() {
         this.focus_events(false);
-        document.body.append(this.caret);
+        this.el.append(this.caret);
         this.lines.push(...this.el.querySelectorAll(this.line_class));
+        // wrap elements in a span, for proper z-indexing
+        for (const ln of this.lines) {
+            const wrapper = document.createElement("span");
+            const children = ln.childNodes ?? [];
+            wrapper.append(...children);
+            ln.append(wrapper);
+        }
         this.lines = this.lines.reverse();
         this.update_line_height();
         this.blink();

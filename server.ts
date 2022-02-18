@@ -23,7 +23,7 @@ app.use(async (ctx: Context, next) => {
 });
 
 const playground = async (ctx: RouterContext) => {
-    const playground = await Deno.readFile("./playground.html");
+    const playground = await Deno.readFile("./playground-ce.html");
     ctx.response.headers =
         new Headers({
             'Content-Type': 'text/html'

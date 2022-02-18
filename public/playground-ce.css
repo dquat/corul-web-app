@@ -11,7 +11,7 @@
     --ff-mono        :                    monospace;
 
     --fs-code        : 14px;
-    --fw-code        : 400;
+    --fw-code        : 200;
 
     --ff-code        : var(--ff-jb-mono);
     --code-rgb       : 251 241 199;
@@ -26,11 +26,11 @@
 }
 
 .editor-container {
-    --gap            : 1rem;
-    padding          : 1rem;
-    flex-direction   : column;
-    height           : 100vh;
-    background-color : var(--ed-cont-color);
+    --gap              : 1rem;
+    padding            : 1rem;
+    grid-template-rows : 2fr 1fr;
+    height             : 100vh;
+    background-color   : var(--ed-cont-color);
 }
 
 .editor, .terminal {
@@ -50,65 +50,15 @@
 }
 
 .editor {
-    padding-left : calc(var(--editor-padding) + var(--line-no-width));
-    position     : relative;
-    flex-grow    : 3;
-}
-
-.editor:before {
-    content      : "";
-    top          : 0;
-    left         : 0;
-    position     : absolute;
-    height       : 100%;
-    width        : var(--line-no-width);
-    border-right : 1px solid var(--code-lines);
+    position    : relative;
+    flex-grow   : 3;
+    outline     : none;
+    border      : 0;
+    overflow    : auto;
+    tab-size    : 4;
+    caret-color : var(--code-color);
 }
 
 .terminal {
     flex-grow : 2;
-}
-
-.caret {
-    background-color : var(--code-color);
-    width            : 1px;
-    position         : fixed;
-    height           : var(--caret-height);
-    transition       : opacity 0.05s ease;
-    pointer-events   : none;
-}
-
-.caret-blink {
-    opacity : 0;
-}
-
-.code-line:before {
-    counter-increment : line;
-    color             : var(--code-lines);
-    content           : counter(line);
-    position          : absolute;
-    display           : inline-block;
-    width             : var(--line-no-width);
-    text-align        : right;
-    padding           : 0 .5rem;
-    overflow          : hidden;
-    text-overflow     : ellipsis;
-    left              : 0;
-    z-index           : 1;
-}
-
-.line-focus span {
-    position: relative;
-    z-index: 1;
-}
-
-.line-focus:after {
-    content          : "";
-    left             : 0;
-    position         : absolute;
-    width            : 100%;
-    height           : calc(var(--lh-default) * var(--fs-code)) /* TODO: figure out a better way to calculate height */;
-    pointer-events   : none;
-    background-color : rgba(0 0 0 / 0.15);
-    z-index          : 0;
 }
