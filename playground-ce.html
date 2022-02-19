@@ -13,7 +13,25 @@
 <body>
 <div class="editor-container container grid">
     <div class="editor" contenteditable="true" spellcheck="false"></div>
-    <div class="terminal">Terminal</div>
+    <div class="terminal"><h1 style="margin: 0;text-align: center">README!</h1>
+This is the WIP, test version of this playground.
+Currently, uses Regex for simple highlighting, which is why it *breaks* under some edge cases.
+It will later use a Lexer, most probably made with Rust and compiled to WASM for best performance.
+Also, the current highlighter, is quite slow.
+Anyway, this is what gets highlighted:
+- strings: <span class='highlight'>"strings"</span>
+- some symbols & brackets: <span class='highlight'>+ - % ^ | ? < > , . ! ~ { } [ ] ( )</span> ...
+- comments:
+    - multiline:
+        <span class='highlight'>/* hello
+         * world! // as you can see, an edge case
+         */</span>
+    - single-line: <span class='highlight'>// hello world!</span>
+- numbers: <span class='highlight'>0 1 2 3 4 5 6 7 8 9</span>
+    * NOTE: decimal numbers don't get highlighted like you'd expect: <span class='highlight'>9.34</span>
+- keywords: <span class='highlight'>fn if else let const for while loop return true false</span>
+Another edge case: <span class='highlight'>performance is currently low.</span>
+</div>
 </div>
 <script src="playground-ce.js"></script>
 </body>
