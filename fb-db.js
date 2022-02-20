@@ -17,6 +17,17 @@ const db = getFirestore(firebaseApp);
 
 export async function add(document) {
     try {
+        try {
+            const links = collection(db, 'playground-links');
+            const q = query(links, where('document', '==', { value: document.value }));
+            const res = await getDocs(q);
+            let all = [];
+            res.forEach(d => all.push(d.id));
+            if (all.length > 0)
+                return all[0];
+        } catch (e) {
+            console.log("Failed to get all matching value, proceeding to add.");
+        }
         const links = collection(db, 'playground-links');
         const added = await addDoc(links, {
             document,
@@ -31,7 +42,7 @@ export async function add(document) {
 
 export async function get(id) {
     try {
-        let links = collection(db, 'playground-links');
+        const links = collection(db, 'playground-links');
         const q = query(links, where(documentId(), '==', id))
         const res = await getDocs(q);
         let get = { id: null, data: null, error: "not-found" };
