@@ -5,10 +5,12 @@
 /* Root settings & variables */
 :root {
     /* Default font styles */
-    --ff-default     : 'Lato', sans-serif, serif, monospace;
-    --fs-default     : clamp(12px, 1.3vw, 24px);
-    --fw-default     : 500;
-    --lh-default     : 1.5;
+    --ff-default              : 'Lato', sans-serif, serif, monospace;
+    --fs-default              : clamp(12px, 1.3vw, 24px);
+    --fw-default              : 500;
+    --fc-default              : rgb(210, 210, 210);
+    --lh-default              : 1.5;
+    --transition-rate-default : 0.15s;
 }
 
 /*******************************************
@@ -24,6 +26,7 @@ body {
     /* min-height     : 100vh; */ /* Quite annoying with margins, so just remove it for now */
     margin         : 0;
     text-rendering : optimizeSpeed;
+    color          : var(--fc-default);
     line-height    : var(--lh-default);
     font-family    : var(--ff-default);
     font-size      : var(--fs-default);

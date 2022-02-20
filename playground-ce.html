@@ -11,8 +11,27 @@
     <link rel="stylesheet" href="playground-ce.css" />
 </head>
 <body>
+<div class="notification-holder flex"></div>
 <div class="editor-container container grid">
-    <div class="editor" contenteditable="true" spellcheck="false"></div>
+    <div class="toolbar grid">
+        <div class="button run">Run</div>
+        <div class="button save">Save</div>
+    </div>
+<div class="editor" contenteditable="true" spellcheck="false">/* * * * * * * * * * * * * * * * * * * * * * *
+ * This program is free to use & distribute  *
+ * It is also perfectly valid Rust code      *
+ * * * * * * * * * * * * * * * * * * * * * * */
+
+fn main() {
+    print!("Starting program...");
+    let x = 10;
+    // always runs
+    if x == 10 {
+        print!("x is ten.");
+        let y = x - 10; // y is zero because x is ten
+        print!("y is zero!");
+    }
+}</div>
     <div class="terminal"><h1 style="margin: 0;text-align: center">README!</h1>
 This is the WIP, test version of this playground.
 Currently, uses Regex for simple highlighting, which is why it *breaks* under some edge cases.
