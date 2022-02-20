@@ -34,6 +34,34 @@ const playground = async (ctx: RouterContext) => {
     ctx.response.body = new TextDecoder('utf-8').decode(playground);
 };
 
+// previous request bodies
+class PRB {
+    arr = Array<{ value: string, id: string }>();
+    ml  = 30;
+    constructor(max_len: number = 30) {
+        this.arr = [];
+        this.ml = 30;
+    }
+
+    add(el: { value: string, id: string }) {
+        if (this.arr.length <= this.ml) {
+            this.arr.shift();
+            this.arr.push(el);
+        }
+    }
+
+    get(value: string) {
+        for (const e of this.arr) {
+            if (e.value == value) {
+                return e.id;
+            }
+        }
+        return null;
+    }
+}
+
+const prb = new PRB(100);
+
 const router =
     new Router()
         .get('/play', playground)
@@ -43,8 +71,14 @@ const router =
             const val = await body.value;
             if (val?.text) {
                 try {
-                    let id = await fb.add({ value: val.text });
-                    ctx.response.body = { status: 200, data: id };
+                    let prev_id = prb.get(val.text);
+                    if (prev_id) {
+                        ctx.response.body = { status: 200, data: prev_id };
+                    } else {
+                        let id = await fb.add({ value: val.text });
+                        prb.add({ value: val.text, id });
+                        ctx.response.body = { status: 200, data: id };
+                    }
                 } catch (e) {
                     console.log(e);
                     ctx.response.body = { status: 500 };
