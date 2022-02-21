@@ -114,8 +114,8 @@ if (query) {
     };
     get(query)
         .then(v => {
-            if (v.status !== 404) {
-                editor.textContent = v.data.data.value;
+            if (v.data !== null) {
+                editor.textContent = v.data.value;
                 editor.innerHTML = colorize(editor.textContent);
             } else
                 failed();
@@ -185,7 +185,7 @@ save_btn.addEventListener('click', async _ => {
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ text: editor.textContent })
+        body: JSON.stringify({ text: editor.textContent, name: "" })
     });
     const doc = await res.json();
     const id = doc.data;
