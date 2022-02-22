@@ -19,7 +19,6 @@ app.addEventListener("listen", ({ hostname , port, secure }) => {
 });
 
 app.use(async (ctx: Context, next) => {
-    console.log("request public?", ctx.request.url.pathname);
     try {
         await ctx.send({
             root: `${Deno.cwd()}/public`,
@@ -31,7 +30,6 @@ app.use(async (ctx: Context, next) => {
 });
 
 app.use(async (ctx: Context, next) => {
-    console.log("request wasm?", ctx.request.url.pathname);
     try {
         await ctx.send({
             root: `${Deno.cwd()}/corul-wasm/pkg`,
@@ -120,7 +118,6 @@ app.use(router.routes());
 app.use(router.allowedMethods());
 
 app.use(async (ctx: Context) => {
-    console.log("found 404", ctx.request.url.pathname);
     const not_found = await Deno.readFile("./404.html");
     ctx.response.headers =
         new Headers({
