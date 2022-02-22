@@ -17,21 +17,7 @@
         <div class="button run">Run</div>
         <div class="button save">Save</div>
     </div>
-<div class="editor" contenteditable="true" spellcheck="false">/* * * * * * * * * * * * * * * * * * * * * * *
- * This program is free to use & distribute  *
- * It is also perfectly valid Rust code      *
- * * * * * * * * * * * * * * * * * * * * * * */
-
-fn main() {
-    print!("Starting program...");
-    let x = 10;
-    // always runs
-    if x == 10 {
-        print!("x is ten.");
-        let y = x - 10; // y is zero because x is ten
-        print!("y is zero!");
-    }
-}</div>
+<div class="editor" contenteditable="true" spellcheck="false"></div>
     <div class="terminal"><h1 style="margin: 0;text-align: center">README!</h1>
 This is the WIP, test version of this playground.
 Currently, uses Regex for simple highlighting, which is why it *breaks* under some edge cases.
@@ -43,15 +29,21 @@ Anyway, this is what gets highlighted:
 - comments:
     - multiline:
         <span class='highlight'>/* hello
-         * world! // as you can see, an edge case
+         * world!
          */</span>
     - single-line: <span class='highlight'>// hello world!</span>
 - numbers: <span class='highlight'>0 1 2 3 4 5 6 7 8 9</span>
     * NOTE: decimal numbers don't get highlighted like you'd expect: <span class='highlight'>9.34</span>
 - keywords: <span class='highlight'>fn if else let const for while loop return true false</span>
-Another edge case: <span class='highlight'>performance is currently low.</span>
+An edge case: <span class='highlight'>performance is currently low.</span>
+Another one: <span class='highlight'>
+/*
+    strings start with /*
+*/
+I'm not supposed to be colored!
+</span>
 </div>
 </div>
-<script src="playground-ce.js"></script>
+<script src="playground-ce.js" type="module"></script>
 </body>
 </html>

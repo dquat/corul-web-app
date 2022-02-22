@@ -193,7 +193,7 @@
 }
 
 .string {
-    color : #7dce00;
+    color : #7dce00 !important;
 }
 
 .number {
@@ -201,11 +201,15 @@
 }
 
 .comment {
-    color      : #928374;
-    font-style : italic;
+    color      : #928374 !important;
+    font-style : italic !important;
 }
 
 .keyword {
     color      : #fe8019;
     font-style : italic;
+}
+
+.identifier {
+
 }

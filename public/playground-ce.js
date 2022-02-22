@@ -1,6 +1,29 @@
 // About innerHTML, I know it's bad and all, and I *will remove* it later on, when I implement
 // an actual colorizing function. For now, deal with it. Or, don't visit this website :)
 
+import init, { lex } from "./corul_wasm.js";
+
+await init();
+// console.log(lex("hello, 10.0"));
+
+const default_input =
+`/* * * * * * * * * * * * * * * * * * * * * * *
+ * This program is free to use & distribute  *
+ * It is also perfectly valid Rust code      *
+ * * * * * * * * * * * * * * * * * * * * * * */
+
+fn main() {
+\tprintln!("Starting program...");
+\tlet x = 10;
+\t// always runs
+\tif x == 10 {
+\t\tprintln!("x is ten.");
+\t\tlet y = x - 10; // y is 0 because x is 10
+\t\tprintln!("y is zero!");
+\t}
+}\n
+`
+
 const _is_chrome       = !!window.chrome; // currently unused...
 const editor           = document.querySelector('.editor');
 const notify_container = document.querySelector('.notification-holder');
@@ -76,22 +99,28 @@ const get = async (id) => {
 }
 
 const colorize = input => {
-    return input
-        // '<' -> &lt; '>' -> &gt;
-        .replace(/</g, '&lt;').replace(/>/g, '&gt;')
-        // strings
-        .replace(/"([^"]*)"?/gs, (s) => `<span class='string'>${s}</span>`)
-        // numbers
-        .replace(/\d+/g, (s) => `<span class='number'>${s}</span>`)
-        // multiline-comments
-        .replace(/\/\*(.*?)\*\//gs, (s) => `<span class='comment'>${s}</span>`)
-        // single line comments
-        .replace(/\/\/(.*)\n?/g, (s) => `<span class='comment'>${s}</span>`)
-        // some, not all special characters
-        .replace(/([\^\-|%!+(){}\[\].,?~]|&lt;|&gt;)/g, (s) => `<span class='special'>${s}</span>`)
-        // some keywords
-        .replace(/(fn|let|const|return|if|else|true|false|for|while|loop)/g,
-            (s) => `<span class='keyword'>${s}</span>`);
+    // console.time("reg");
+    // input
+    //     // '<' -> &lt; '>' -> &gt;
+    //     .replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    //     // numbers
+    //     .replace(/\d+/g, (s) => `<span class='number'>${s}</span>`)
+    //     // single line comments
+    //     .replace(/\/\/(.*)\n?/g, (s) => `<span class='comment'>${s}</span>`)
+    //     // some, not all special characters
+    //     .replace(/([\^\-|%!+(){}\[\].,?~]|&lt;|&gt;)/g, (s) => `<span class='special'>${s}</span>`)
+    //     // some keywords
+    //     .replace(/(fn|let|const|return|if|else|true|false|for|while|loop)/g,
+    //         (s) => `<span class='keyword'>${s}</span>`)
+    //     // strings
+    //     .replace(/"([^"]*)"?/gs, (s) => `<span class='string'>${s}</span>`)
+    //     // multiline-comments
+    //     .replace(/\/\*(.*?)\*\//gs, (s) => `<span class='comment'>${s}</span>`)
+    // console.timeEnd("reg");
+    // console.time("lex");
+    // lex(input);
+    // console.timeEnd("lex")
+    return lex(input);
 }
 
 for (const highlighter of highlights)
@@ -100,7 +129,6 @@ for (const highlighter of highlights)
 const params = new URLSearchParams(window.location.search);
 const query = params.get("q");
 if (query) {
-    let prev = editor.textContent;
     editor.textContent = "Loading...";
     const failed = () => {
         notify(
@@ -109,7 +137,7 @@ if (query) {
             5000,
             'n-err'
         );
-        editor.textContent = prev;
+        editor.textContent = default_input;
         editor.innerHTML = colorize(editor.textContent);
     };
     get(query)
@@ -125,7 +153,7 @@ if (query) {
             failed();
         });
 } else
-    editor.innerHTML = colorize(editor.textContent);
+    editor.innerHTML = colorize(default_input);
 
 const input = _ => {
     const sel = window.getSelection();

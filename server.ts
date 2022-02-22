@@ -1,7 +1,5 @@
 // oak server
 import { Application, Router, RouterContext, Context } from "https://deno.land/x/oak/mod.ts";
-// firebase database
-// import * as fb from './fb-db.js';
 
 const prod = !!Deno.env.get("PROD");
 const db_url =
@@ -31,6 +29,16 @@ app.use(async (ctx: Context, next) => {
     }
 });
 
+app.use(async (ctx: Context, next) => {
+    try {
+        await ctx.send({
+            root: `${Deno.cwd()}/corul-wasm/pkg`,
+        });
+    } catch {
+        await next();
+    }
+});
+
 const playground = async (ctx: RouterContext) => {
     const playground = await Deno.readFile("./playground-ce.html");
     ctx.response.headers =
@@ -40,39 +48,6 @@ const playground = async (ctx: RouterContext) => {
     ctx.response.body = new TextDecoder('utf-8').decode(playground);
 };
 
-// previous request bodies
-class PRB {
-    arr = Array<{ value: string | null, id: string | null }>();
-    ml  = 30;
-    constructor(max_len: number = 30) {
-        this.arr = [];
-        this.ml = max_len;
-    }
-
-    add(el: { value: string | null, id: string | null }) {
-        if (this.arr.length >= this.ml)
-            this.arr.shift();
-        this.arr.push(el);
-    }
-
-    get_value(value: string) {
-        for (const e of this.arr) {
-            if (e.value == value)
-                return e.id;
-        }
-        return null;
-    }
-
-    get_id(id: string) {
-        for (const e of this.arr) {
-            if (e.id == id)
-                return e.value;
-        }
-        return null;
-    }
-}
-
-const prb = new PRB(100);
 const max_title_len = 50;
 const max_value_len = 200000;
 const router =
