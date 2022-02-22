@@ -14,6 +14,14 @@ jobs:
         uses: actions/checkout@v2
 
       # TODO(dquat): add a build step here
+      - name: Install wasm-pack
+        run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+        
+      - name: Build using wasm-pack
+        run: cd ./corul-wasm && wasm-pack build --release --target web
+        
+      - name: Go back to base dir
+        run: cd ..
 
       - name: Upload to Deno Deploy
         uses: denoland/deployctl@v1
