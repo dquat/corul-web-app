@@ -3,5 +3,7 @@ corul-wasm/target
 #corul-wasm/**/*.rs.bk
 corul-wasm/Cargo.lock
 corul-wasm/bin/
+corul-wasm/pkg/package.json
+corul-wasm/pkg/.gitignore
 corul-wasm/wasm-pack.log
 sb-db.js
