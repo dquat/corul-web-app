@@ -210,6 +210,14 @@
     font-style : italic;
 }
 
-.identifier {
+.identifier, .variable-declaration {
+    color : #d6dcaf;
+}
 
+.fn-declaration {
+    color : #ffc66d;
+}
+
+.variable-declaration {
+    font-weight : 600;
 }

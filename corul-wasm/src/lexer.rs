@@ -3,8 +3,8 @@ use std::iter::Peekable;
 use std::ops::Range;
 use std::str::CharIndices;
 
-const KWS: [&'static str; 11] = [
-    "true", "false", "for", "while", "loop", "if", "else", "const", "let", "fn", "return"
+const KWS: [&'static str; 12] = [
+    "true", "false", "for", "while", "loop", "if", "else", "const", "let", "fn", "return", "static"
 ];
 
 // a simple little convenience macro
@@ -40,7 +40,7 @@ impl<'a> Lexer<'a> {
         start..end
     }
 
-    fn take_while(&mut self, mut predicate: impl FnMut(char) -> bool) -> &str {
+    fn take_while(&mut self, predicate: impl FnMut(char) -> bool) -> &str {
         let rng = self.take_while_rng(predicate);
         &self.src[rng]
     }
@@ -56,16 +56,21 @@ impl<'a> Lexer<'a> {
         // be made up of valid tokens
         let mut s = String::with_capacity(self.src.len() * 15);
         let end = "</span>";
-        let mut add = |string: &mut String, tag: &str, value: &str| {
+        let add = |string: &mut String, tag: &str, value: &str| {
             string.push_str(tag);
             string.push_str(value);
             string.push_str(end);
         };
+        let mut mode = 0usize;
+        // 0 -> nothing
+        // 1 -> function declaration
+        // 2 -> let variable declaration
         loop {
             if self.eof() { break; }
-            let &(i, char) = self.it.peek().unwrap();
+            let &(_, char) = self.it.peek().unwrap();
             match char {
                 '\"' => {
+                    mode = 0;
                     let mut first = true;
                     let mut rng = self.take_while_rng(|c| {
                         let res = c != '\"' || first;
@@ -83,6 +88,7 @@ impl<'a> Lexer<'a> {
                 },
 
                 c if c.is_digit(10) => {
+                    mode = 0;
                     let mut dot = false;
                     let rng = self.take_while_rng(|c| {
                         if c == '.' {
@@ -114,12 +120,20 @@ impl<'a> Lexer<'a> {
                             c == '#'            ||
                             c == '\''
                     );
-                    let tag =
-                        if KWS.contains(&str) { tag!("keyword") } else { tag!("identifier") };
+                    let tag = match (mode, KWS.contains(&str)) {
+                        (_, true) => tag!("keyword"),
+                        (1, _) => tag!("fn-declaration"),
+                        (2, _) => tag!("variable-declaration"),
+                        _ => tag!("identifier"),
+                    };
+                    mode = 0;
+                    if str == "fn" { mode = 1; }
+                    if str == "let" || str == "const" { mode = 2; }
                     add(&mut s, tag, str);
                 },
 
                 '/' => {
+                    mode = 0;
                     drop(self.it.next());
                     let peek = self.it.peek();
                     if let Some(&(_, '/')) = peek {
@@ -154,7 +168,8 @@ impl<'a> Lexer<'a> {
                 }
 
                 c @ ('+' | '-' | '=' | ',' | '.' | '?' | '{' | '}' | '[' |
-                ']' | '|' | '(' | ')' | '*' | '!' | '~' | '$' | '%' | '^')  => {
+                ']' | '|' | '(' | ')' | '*' | '!' | '~' | '$' | '%' | '^' | ';')  => {
+                    mode = 0;
                     drop(self.it.next());
                     s.push_str(tag!("special"));
                     s.push(c);
@@ -162,6 +177,7 @@ impl<'a> Lexer<'a> {
                 },
 
                 c @ ('&' | '<' | '>') => {
+                    mode = 0;
                     drop(self.it.next());
                     let esc = match c {
                         '&' => "&amp;", '<' => "&lt;", '>' => "&gt;",
@@ -171,6 +187,7 @@ impl<'a> Lexer<'a> {
                 }
 
                 c => {
+                    // mode = 0;
                     drop(self.it.next());
                     s.push(c);
                 }

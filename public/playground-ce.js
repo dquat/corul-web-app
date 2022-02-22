@@ -7,10 +7,14 @@ await init();
 // console.log(lex("hello, 10.0"));
 
 const default_input =
-`/* * * * * * * * * * * * * * * * * * * * * * *
- * This program is free to use & distribute  *
- * It is also perfectly valid Rust code      *
- * * * * * * * * * * * * * * * * * * * * * * */
+`/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * This program is free to use & distribute                          *
+ * It is also perfectly valid Rust code.                             *
+ * It's currently used as a placeholder for my programming language  * 
+ * which is still under development.                                 *
+ * Repo for web app: https://github.com/dquat/corul-web-app          *
+ * Repo for language: https://github.com/dquat/Corul                 *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 fn main() {
 \tprintln!("Starting program...");
