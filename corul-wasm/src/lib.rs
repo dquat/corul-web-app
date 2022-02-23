@@ -11,10 +11,11 @@ pub fn lex(value: &str) -> String {
 mod tests {
     use crate::lexer;
     use lexer::Lexer;
+    use lexer::esc;
     #[test]
     fn x() {
-        let mut lexer = Lexer::new(r#"/* /*"hello!" <>* / &++*/
-boom!"#);
+        let mut lexer = Lexer::new(r#"<"#);
+        let mut ci = "ಹ".char_indices();
         println!("{:?}", lexer.string());
     }
 }

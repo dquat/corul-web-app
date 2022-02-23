@@ -15,18 +15,50 @@
 <div class="editor-container container grid">
     <div class="toolbar grid">
         <div class="button run">Run</div>
-        <div class="button save">Save</div>
+        <div class="button save">Save / Share</div>
     </div>
-<div class="editor" contenteditable="true" spellcheck="false"></div>
+<code class="editor" contenteditable="true" spellcheck="false"></code>
     <div class="terminal"><h1 style="margin: 0;text-align: center">README!</h1>
-<h2 style="margin: 0;text-align: center">NOW USING WASM! (still slow)</h2>
+<h2 style="margin: 0;text-align: center">"Release Notes"</h2>
+I suppose I'm now on v0.0.2 &lt;experimental&gt; this website?
+- Well this time I fixed a bug where when you copy-paste, in some cases, like from a JB ide,
+  everything would jump to a single line, even when the copy was spanning several lines
+
+- Also reduced the "jumpiness" of the caret when copying and pasting code, i.e. fixed caret moving to
+  wrong location upon pasting code
+Well that's about it I guess...
+
+Now for the known issues:
+- Undo - Redo does not work / is buggy
+
+Off to the next section! introduction. should I put this section below the introduction, by any chance?
+<h2 style="margin: 0;text-align: center">Intro</h2>
 This is the WIP, test version of this playground.
-It is using a basic Lexer, probably made with Rust and compiled to WASM for best performance.
+It is using a basic Lexer, made with Rust and compiled to WASM for best performance.
 This still ends up being as slow as regex... I need to figure out some optimization for typing,
-since rendering the highlights takes longer than actually lexing the input
+since rendering the highlights takes longer than actually lexing the input.
+it takes +-5 around 35ms to lex 500,000 characters, or 4 hundredths of a second.
+a full 60 FPS lex would need a time less than 17ms per lex, so with 500,000 characters, the
+editor should ideally be running at ~30 FPS, but due to the slow painting speed of hundreds of
+thousands of elements, it takes several seconds just to enter a character, and be rendered in the
+browser. So, clearly rendering is the bottleneck. To eliminate it, I must somehow <b><i>only</i> render</b>
+the visible elements, and make the scrolling look as believable as possible at the same time.
+Clearly this requires an algorithm, and I'm slow to come up with good algorithms.
+So eradicating the performance concern will take some time, as I work on other parts of this website.
 Anyway, this is what gets highlighted:
+- identifiers: <span class='highlight'>it's pretty much anything</span>
+    - valid:
+        <span class='highlight'>a' /* yes, like haskell 😀 */
+        do_you_like_c# /* cool 😏 */
+        me~is~var /* ooh, interesting? 🤨 */
+        normale_variable912 /* booooring 😒 */
+        </span>
 - strings: <span class='highlight'>"strings"</span>
-- symbols & brackets: <span class='highlight'>+ - % ^ | / = ? < > , . ! ~ $ * { } [ ] ( ) &amp; &gt; &lt; ;</span>
+- characters: <span class='highlight'>'c' 'h' 'a' 'r' '!'</span>
+    - invalid:
+        <span class='highlight'>'char' // 'c <- the character, har' -> the identifier</span>
+        <span class='highlight'>'' // yes this looks right, but it's really not</span>
+- symbols & brackets: <span class='highlight'>+ - % ^ | / = ? , . ! ~ $ * { } [ ] ( ) &amp; &gt; &lt; ;</span>
 - comments:
     - multiline:
         <span class='highlight'>/* hello
@@ -40,10 +72,14 @@ Anyway, this is what gets highlighted:
 - numbers: <span class='highlight'>0 1 2 3 4 5 6 7 8 9</span>
     - decimals: <span class='highlight'>1.29 0.192</span>
         - invalid: <span class='highlight'>1..94 0.4.2.1 .3 8.</span>
-- keywords: <span class='highlight'>fn if else let const for while loop return true false static</span>
+- keywords: <span class='highlight'>fn if else let const for while loop return true false static struct pub mut in self match impl</span>
 - declarations:
-    - let: <span class='highlight'>let x = 0;</span>
-    - const: <span class='highlight'>const y = 0;</span>
+    - let:
+        <span class='highlight'>let x = 0;</span>
+        <span class='highlight'>let mut x = 0;</span>
+    - const:
+        <span class='highlight'>const y = 0;</span>
+        - invalid: <span class='highlight'>const mut y = 0; // yeah this gets highlighted correctly, but still wrong!</span>
     - fn: <span class='highlight'>fn function() { /* body */ }</span>
 </div>
 </div>

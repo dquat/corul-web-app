@@ -3,8 +3,9 @@ use std::iter::Peekable;
 use std::ops::Range;
 use std::str::CharIndices;
 
-const KWS: [&'static str; 12] = [
-    "true", "false", "for", "while", "loop", "if", "else", "const", "let", "fn", "return", "static"
+const KWS: [&'static str; 19] = [
+    "true", "false", "for", "while", "loop", "if", "else", "const", "let", "fn", "return", "static",
+    "pub", "struct", "mut", "self", "impl", "match", "in"
 ];
 
 // a simple little convenience macro
@@ -13,6 +14,35 @@ macro_rules! tag {
         concat!("<span class='", $class_name, "'>")
     }
 }
+
+pub fn esc(input: &str) -> Cow<str> {
+    for (i, ch) in input.chars().enumerate() {
+        if esc_c(ch).is_some() {
+            let mut escaped_string = String::with_capacity(input.len());
+            escaped_string.push_str(&input[..i]);
+            for ch in input[i..].chars() {
+                match esc_c(ch) {
+                    Some(escaped_char) => escaped_string.push_str(escaped_char),
+                    None => escaped_string.push(ch),
+                };
+            }
+            return Cow::Owned(escaped_string);
+        }
+    }
+    Cow::Borrowed(input)
+}
+
+fn esc_c(ch: char) -> Option<&'static str> {
+    match ch {
+        '&'  => Some("&amp;"),
+        '<'  => Some("&lt;"),
+        '>'  => Some("&gt;"),
+        '"'  => Some("&quot;"),
+        '\'' => Some("&#x27;"),
+        _    => None,
+    }
+}
+
 
 pub struct Lexer<'a> {
     src: Cow<'a, str>,
@@ -34,8 +64,8 @@ impl<'a> Lexer<'a> {
             None => self.src.len()
         };
         let mut end = start;
-        while let Some((i, _)) = self.it.next_if(|&(_, c)| predicate(c)) {
-            end = i + 1;
+        while let Some((_, c)) = self.it.next_if(|&(_, c)| predicate(c)) {
+            end += c.len_utf8();
         }
         start..end
     }
@@ -58,7 +88,10 @@ impl<'a> Lexer<'a> {
         let end = "</span>";
         let add = |string: &mut String, tag: &str, value: &str| {
             string.push_str(tag);
-            string.push_str(value);
+            match esc(value) {
+                Cow::Owned   (v) => string.push_str(&*v),
+                Cow::Borrowed(v) => string.push_str(v)
+            };
             string.push_str(end);
         };
         let mut mode = 0usize;
@@ -85,6 +118,26 @@ impl<'a> Lexer<'a> {
                         false
                     });
                     add(&mut s, tag!("string"), &self.src[rng]);
+                },
+
+                '\'' => {
+                    mode = 0;
+                    let mut first = true;
+                    drop(self.it.next());
+                    let mut rng = self.take_while_rng(|_| {
+                        let res = first;
+                        first = false;
+                        res
+                    });
+                    rng.start -= 1;
+                    self.it.next_if(|&(_, c)| {
+                        if c == '\'' {
+                            rng.end += 1;
+                            return true;
+                        }
+                        false
+                    });
+                    add(&mut s, tag!("char"), &self.src[rng]);
                 },
 
                 c if c.is_digit(10) => {
@@ -126,7 +179,7 @@ impl<'a> Lexer<'a> {
                         (2, _) => tag!("variable-declaration"),
                         _ => tag!("identifier"),
                     };
-                    mode = 0;
+                    if mode != 2 || str != "mut" { mode = 0; }
                     if str == "fn" { mode = 1; }
                     if str == "let" || str == "const" { mode = 2; }
                     add(&mut s, tag, str);
@@ -167,8 +220,11 @@ impl<'a> Lexer<'a> {
                     }
                 }
 
-                c @ ('+' | '-' | '=' | ',' | '.' | '?' | '{' | '}' | '[' |
-                ']' | '|' | '(' | ')' | '*' | '!' | '~' | '$' | '%' | '^' | ';')  => {
+                c @ (
+                    '+' | '-' | '=' | ',' | '.' | '?' | '{' |
+                    '}' | '[' | ']' | '|' | '(' | ')' | '*' |
+                    '!' | '~' | '$' | '%' | '^' | ';' | ':'
+                ) => {
                     mode = 0;
                     drop(self.it.next());
                     s.push_str(tag!("special"));
@@ -183,11 +239,12 @@ impl<'a> Lexer<'a> {
                         '&' => "&amp;", '<' => "&lt;", '>' => "&gt;",
                         _ => unreachable!()
                     };
-                    add(&mut s, tag!("special"), esc);
+                    s.push_str(tag!("special"));
+                    s.push_str(&*esc.to_string());
+                    s.push_str(end);
                 }
 
                 c => {
-                    // mode = 0;
                     drop(self.it.next());
                     s.push(c);
                 }

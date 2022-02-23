@@ -62,6 +62,7 @@
 }
 
 .editor {
+    contain: paint;
     position    : relative;
     flex-grow   : 3;
     outline     : none;
@@ -192,7 +193,7 @@
     font-weight : 400;
 }
 
-.string {
+.string, .char {
     color : #7dce00 !important;
 }
 

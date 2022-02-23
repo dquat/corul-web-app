@@ -8,17 +8,19 @@ await init();
 
 const default_input =
 `/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- * This program is free to use & distribute                          *
+ * This program is free to use & distribute (no copyright)           *
  * It is also perfectly valid Rust code.                             *
- * It's currently used as a placeholder for my programming language  * 
- * which is still under development.                                 *
- * Repo for web app: https://github.com/dquat/corul-web-app          *
+ * It's currently used as a placeholder for my programming language  *
+ * which is still under development (unusable to any extent).        *
+ * Repo for this web app: https://github.com/dquat/corul-web-app     *
  * Repo for language: https://github.com/dquat/Corul                 *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
+// Here's a sample Rust program, for you to edit while you're here
+// or if you're the enthusiastic kind, waiting for me to finish my language.
 fn main() {
 \tprintln!("Starting program...");
-\tlet x = 10;
+\tconst x = 10;
 \t// always runs
 \tif x == 10 {
 \t\tprintln!("x is ten.");
@@ -41,17 +43,41 @@ function locate_cursor_pos(root, index) {
     const NODE_TYPE = NodeFilter.SHOW_TEXT;
     const treeWalker =
         document.createTreeWalker(root, NODE_TYPE, (elem) => {
-            if (index > elem.textContent.length) {
-                index -= elem.textContent.length;
+            let l = (elem.textContent || elem.innerText).length;
+            if (index > l) {
+                index -= l;
                 return NodeFilter.FILTER_REJECT;
             }
             return NodeFilter.FILTER_ACCEPT;
         });
-    const c = treeWalker.nextNode();
+    let c = treeWalker.nextNode();
+    if (!c) console.log("caret node is null!");
     return {
         node: c ? c : root,
         position: index
     };
+    // let charIndex = 0;
+    // let nodeStack = [root], node = root;
+    // let pos = 0;
+    // while (node = nodeStack.pop()) {
+    //     if (node.nodeType === 3) {
+    //         let nextCharIndex = charIndex + node.length;
+    //         if (index >= charIndex && index <= nextCharIndex) {
+    //             pos = index - charIndex;
+    //             break;
+    //         }
+    //         charIndex = nextCharIndex;
+    //     } else {
+    //         let i = node.childNodes.length;
+    //         while (i--) {
+    //             nodeStack.push(node.childNodes[i]);
+    //         }
+    //     }
+    // }
+    // return {
+    //     node,
+    //     position: pos
+    // }
 }
 
 const notify = (
@@ -162,28 +188,42 @@ if (query) {
 const input = _ => {
     const sel = window.getSelection();
     const rng = sel.getRangeAt(0);
-    const clone = rng.cloneRange();
-    clone.setStart(editor, 0);
-    const len = clone.toString().length;
+    // const clone = rng.cloneRange();
+    rng.setStart(editor, 0);
+    const len = rng.toString().length//.replace(/\r/g, '').length;
+    // console.log( [clone.toString().replace(/\r/g, '')]);
     let tc = editor.textContent;
     // test highlighting, a simple, regex based one, not the real one tho
     editor.innerHTML =
-        colorize(editor.textContent)
+        colorize(tc)
         // fixes bug in chromium (wants 2 '\n's at the end of input for 1 '\n')
         // and maybe firefox bug too?...
         + (tc.slice(-1) !== '\n' ? '\n' : '');
 
-    let range = document.createRange();
-    range.setStart(editor, 0);
     let {node, position} = locate_cursor_pos(editor, len);
+    let range = document.createRange();
+    sel.removeAllRanges();
     range.setStart(node, position);
     range.setEnd(node, position);
-    range.collapse(true);
-    sel.removeAllRanges();
     sel.addRange(range);
 }
 
 editor.addEventListener("input", input);
+
+editor.addEventListener("paste", e => {
+    // some copy-paste text is not formatted correctly due to .textContent reading it incorrectly
+    // so the paste event is used as a workaround for this issue
+    e.preventDefault();
+    let txt =
+        (e.clipboardData || window.clipboardData).getData('text')
+            .replace(/\r/g, '');
+    let sel = window.getSelection();
+    let rng = sel.getRangeAt(0);
+    sel.deleteFromDocument();
+    rng.insertNode(document.createTextNode(txt));
+    rng.collapse(false);
+    input(e);
+});
 
 editor.addEventListener('keydown', e => {
     if (e.key === "Tab" || (e.keyCode || e.which) === 9) {
