@@ -5,4 +5,3 @@ corul-wasm/Cargo.lock
 corul-wasm/bin/
 corul-wasm/pkg/
 corul-wasm/wasm-pack.log
-databases/sb-db.js
