@@ -124,7 +124,7 @@
     overflow-y     : auto;
 }
 
-.notification {
+.notification, .msg {
     padding          : 10px;
     position         : relative;
     border-radius    : 0.25rem;
@@ -134,7 +134,7 @@
     display          : flex;
 }
 
-.notification:hover {
+.notification:hover, .msg:hover {
     background-color : rgb(30 30 30);
 }
 
@@ -162,7 +162,7 @@
     background-color : rgb(171 153 48);
 }
 
-.n-err{
+.n-err {
     background-color : rgba(169 35 35 / 0.85);
 }
 
@@ -170,7 +170,7 @@
     background-color : rgb(169 35 35);
 }
 
-.notification .time-stamp {
+.notification .time-stamp, .msg .time-stamp {
     align-self       : flex-start;
     flex-shrink: 3;
     margin           : 0;
@@ -183,8 +183,12 @@
     background-color : rgba(10 10 10);
 }
 
-.notification .message {
-    flex-grow: 1;
+.notification .message, .msg .message {
+    flex-grow : 1;
+}
+
+.artificial-link {
+    text-decoration : underline;
 }
 
 /* Highlighter classes */

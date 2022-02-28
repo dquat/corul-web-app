@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="The playground for the Corul programming language (both are WIP)." />
+    <meta name="color-scheme" content="dark light" />
+    <title>The Corul Playground</title>
+    <link rel="stylesheet" href="http://fonts.cdnfonts.com/css/cascadia-code">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&family=JetBrains+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800&family=Roboto+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=Source+Code+Pro:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap">
+    <link rel="stylesheet" href="global.css" />
+    <link rel="stylesheet" href="playground.css" />
+</head>
+<body>
+<div class="horizontal main grid">
+    <div class="tool-bar flex">
+        <div class="tb-name">The Corul Playground v0.0.3</div>
+        <div class="btn run" title="Run the code [unimplemented]">
+            <svg xmlns="http://www.w3.org/2000/svg" height="100%" viewBox="0 0 16 16">
+                <path d="m11.596 8.697-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z"/>
+            </svg>
+        </div>
+        <div class="btn save" title="Save or share the code (generate link for this playground)">
+            <svg xmlns="http://www.w3.org/2000/svg" height="100%" viewBox="0 0 16 16">
+                <path d="M4.715 6.542 3.343 7.914a3 3 0 1 0 4.243 4.243l1.828-1.829A3 3 0 0 0 8.586 5.5L8 6.086a1.002 1.002 0 0 0-.154.199 2 2 0 0 1 .861 3.337L6.88 11.45a2 2 0 1 1-2.83-2.83l.793-.792a4.018 4.018 0 0 1-.128-1.287z"/>
+                <path d="M6.586 4.672A3 3 0 0 0 7.414 9.5l.775-.776a2 2 0 0 1-.896-3.346L9.12 3.55a2 2 0 1 1 2.83 2.83l-.793.792c.112.42.155.855.128 1.287l1.372-1.372a3 3 0 1 0-4.243-4.243L6.586 4.672z"/>
+            </svg>
+        </div>
+        <div class="btn layout" title="Change layout (vertical / horizontal)">
+            <svg xmlns="http://www.w3.org/2000/svg" height="70%" viewBox="0 0 16 16">
+                <path d="M0 1a1 1 0 0 1 1-1h5a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H1a1 1 0 0 1-1-1V1zm9 0a1 1 0 0 1 1-1h5a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1h-5a1 1 0 0 1-1-1V1zm0 9a1 1 0 0 1 1-1h5a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1h-5a1 1 0 0 1-1-1v-5z"/>
+            </svg>
+        </div>
+        <div class="btn theme" title="Change the theme of this playground [unimplemented]">
+            <svg xmlns="http://www.w3.org/2000/svg" height="70%" viewBox="0 0 16 16">
+                <path d="M15.825.12a.5.5 0 0 1 .132.584c-1.53 3.43-4.743 8.17-7.095 10.64a6.067 6.067 0 0 1-2.373 1.534c-.018.227-.06.538-.16.868-.201.659-.667 1.479-1.708 1.74a8.118 8.118 0 0 1-3.078.132 3.659 3.659 0 0 1-.562-.135 1.382 1.382 0 0 1-.466-.247.714.714 0 0 1-.204-.288.622.622 0 0 1 .004-.443c.095-.245.316-.38.461-.452.394-.197.625-.453.867-.826.095-.144.184-.297.287-.472l.117-.198c.151-.255.326-.54.546-.848.528-.739 1.201-.925 1.746-.896.126.007.243.025.348.048.062-.172.142-.38.238-.608.261-.619.658-1.419 1.187-2.069 2.176-2.67 6.18-6.206 9.117-8.104a.5.5 0 0 1 .596.04z"/>
+            </svg>
+        </div>
+        <div class="btn settings" title="Open the settings pane (settings stored only in this browser) [unimplemented]">
+            <svg xmlns="http://www.w3.org/2000/svg" height="70%" viewBox="0 0 16 16">
+                <path d="M9.405 1.05c-.413-1.4-2.397-1.4-2.81 0l-.1.34a1.464 1.464 0 0 1-2.105.872l-.31-.17c-1.283-.698-2.686.705-1.987 1.987l.169.311c.446.82.023 1.841-.872 2.105l-.34.1c-1.4.413-1.4 2.397 0 2.81l.34.1a1.464 1.464 0 0 1 .872 2.105l-.17.31c-.698 1.283.705 2.686 1.987 1.987l.311-.169a1.464 1.464 0 0 1 2.105.872l.1.34c.413 1.4 2.397 1.4 2.81 0l.1-.34a1.464 1.464 0 0 1 2.105-.872l.31.17c1.283.698 2.686-.705 1.987-1.987l-.169-.311a1.464 1.464 0 0 1 .872-2.105l.34-.1c1.4-.413 1.4-2.397 0-2.81l-.34-.1a1.464 1.464 0 0 1-.872-2.105l.17-.31c.698-1.283-.705-2.686-1.987-1.987l-.311.169a1.464 1.464 0 0 1-2.105-.872l-.1-.34zM8 10.93a2.929 2.929 0 1 1 0-5.86 2.929 2.929 0 0 1 0 5.858z"/>
+            </svg>
+        </div>
+    </div>
+    <div class="editor" contenteditable="true" spellcheck="false">Editor</div>
+    <div class="bar"></div>
+    <div class="opener">
+        <div class="terminal tab" tab-name="Terminal" >Terminal
+Unimplemented because language is not even in a workable condition!</div>
+        <div class="notifications tab" tab-name="Notifications" >
+            <h2 class="tab-heading">Notifications</h2>
+            <div class="separator-bar"></div>
+            <p class="no-notif-plchldr">No notifications!</p>
+        </div>
+        <div class="readme tab" tab-name="Readme" visible="true">
+            <h2 class="tab-heading">Readme!</h2>
+            <div class="separator-bar"></div>
+            <div class="readme-text" style="white-space: pre">
+                <script>
+                    const rdme = document.querySelector('.readme-text');
+                    fetch('/readme.html', {
+                        method: 'GET',
+                        headers: { 'Accept': 'text/html' }
+                    })
+                        .then(t =>
+                            t.text()
+                                .then(t => rdme.innerHTML = t))
+                        .catch(e =>
+                            rdme.textContent = "Failed to load Readme! :( [Check your connection]"
+                        );
+                </script>
+            </div>
+        </div>
+        <div class="project-settings tab" tab-name="Project Settings">
+            <h2 class="tab-heading">Current playground details</h2>
+            <div class="separator-bar"></div>
+            <div class="playground-details">
+                <label for="playground-name">Playground name:</label>
+                <input id="playground-name" placeholder="Empty = random name" type="text" size="1" />
+                <br />
+                Storage type:
+                <br />
+                <input id="db" type="radio" name="storage-type" checked />
+                <label for="db">Database</label>
+                <br />
+                <input id="url" type="radio" name="storage-type" disabled />
+                <label for="url">Encoded URL (unimplemented)</label>
+            </div>
+        </div>
+    </div>
+    <div class="footer-bar"></div>
+</div>
+<script src="playground-ui.js"></script>
+<script src="playground.js" type="module"></script>
+</body>
+</html>

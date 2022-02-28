@@ -1,164 +1,166 @@
-// last 2 are depreciated, but if e is null, they can be used instead
-const get_e = e => e || window.event || event;
-const resolve_target = e => {
-    const target = e.target instanceof HTMLElement ? e.target : e.target?.parentElement;
-    if (!target)
-        throw "Could not find event target element!";
-    return target;
-}
+// About innerHTML, I know it's bad and all, and I *will remove* it later on, when I implement
+// an actual colorizing function. For now, deal with it. Or, don't visit this website :)
 
-const TEParams =  {
-    caret_class    : 'caret',
-    line_class     : 'code-line',
-    blink_interval : 500,
-    blink_class    : 'caret-blink',
-    focused_class  : 'editor-focus',
-    editor_class   : 'editor',
-    line_focused   : 'line-focus',
-}
+import init, { lex } from "./corul_wasm.js";
 
-// WYSIWYG
-// the "hack" text editor, allows us to have full control making
-// code highlighting
-// line numbering
-// current-line highlighting
-// bold & italics
-// much easier to use, if it were even possible with a text area / content editable elements
-class TextEditor {
-    constructor(
-        el = document.body,
-        params = TEParams
-    ) {
-        this.el = el;
-        this.caret = document.createElement('div');
-        if (params.caret_class)
-            this.caret.classList.add(params.caret_class);
-        this.line_class  = '.' + (params.line_class || TEParams.line_class);
-        this.blink_class = params.blink_class || TEParams.blink_class;
-        this.lines = [];
-        this.blinker = null;
-        this.blink_interval = params.blink_interval ?? TEParams.blink_interval;
-        this.focus_class = params.focused_class || TEParams.focused_class;
-        this.editor_class = '.' + (params.editor_class || TEParams.editor_class);
-        this.line_focused = (params.line_focused || TEParams.line_focused);
-        this.prev_focus_line = null;
+import { locate_cursor_pos, load, add, default_input } from "./playground-utils.old.js";
+
+(async () => {
+
+    await init(); // initialize wasm
+
+    const _is_chrome       = !!window.chrome, // currently unused...
+          editor           = document.querySelector('.editor'),
+          save_btn         = document.querySelector('.save'),
+          run_btn          = document.querySelector('.run'),
+          play_name        = document.querySelector('#playground-name'),
+          highlights       = document.querySelectorAll('.highlight');
+
+    let waiting_for_link   = false;
+
+    const colorize = input => lex(input);
+
+    for (const highlighter of highlights)
+        highlighter.innerHTML = colorize(highlighter.textContent);
+
+    const id = new URLSearchParams(window.location.search).get('i');
+
+    try {
+        const then = Date.now();
+        const res = await load(id);
+        // should be true always if no errors occur during load, but still
+        if (res?.value)
+            editor.innerHTML = colorize(res.value);
+        if (res?.name)
+            play_name.value = res.name;
+        notifs.set_type("n-success");
+        notifs.send(`Loaded content successfully in ${Date.now() - then}ms!`);
+    } catch (e) {
+        if (e) {
+            notifs.set_type("n-err");
+            notifs.send(`Failed to load content! ${e}`);
+        }
+        editor.innerHTML = colorize(default_input);
     }
 
-    blink() {
-        this.blinker = setInterval(() => {
-            this.caret.classList.toggle(this.blink_class);
-        }, this.blink_interval);
-    }
-
-    get_closest_ln(e) {
-        const cy = e.clientY || e.pageY || e.screenY;
-        const target = resolve_target(e);
-        let closest = target.closest(this.line_class);
-        if (!closest)
-            for (const ln of this.lines) {
-                const top = ln.getBoundingClientRect().top;
-                if (cy >= top) {
-                    closest = ln;
-                    break;
-                }
-            }
-        if (!closest)
-            if (cy < this.lines[this.lines.length - 1]?.getBoundingClientRect().top)
-                closest = this.lines[this.lines.length - 1];
-            else
-                closest = this.lines[0];
-        return closest;
-    }
-
-    set_curr_line(line) {
-        if (line && line !== this.prev_focus_line) {
-            for (const ln of this.lines)
-                ln.classList.remove(this.line_focused);
-            line.classList.add(this.line_focused);
-            this.prev_focus_line = line;
-        } else if (!line)
-            for (const ln of this.lines)
-                ln.classList.remove(this.line_focused);
-    }
-
-    update_selection(e) {
+    const input = _ => {
         const sel = window.getSelection();
-        if (sel) {
-            const node   = sel.anchorNode,
-                  offset = sel.anchorOffset;
-            if (node) {
-                let range = document.createRange();
-                range.setStart(node, offset);
-                range.setEnd  (node, offset);
-                this.set_curr_line(node.parentElement?.closest(this.line_class));
-                const bc = range.getBoundingClientRect();
-                this.caret.style.left = `${bc.left}px`;
-                this.caret.style.top  = `${bc.top }px`;
-            } else {
-                const closest = this.get_closest_ln(e);
-                if (closest) {
-                    const bc = closest.getBoundingClientRect();
-                    this.caret.style.left = `${bc.left}px`;
-                    this.caret.style.top  = `${bc.top }px`;
-                }
+        const rng = sel.getRangeAt(0);
+        rng.setStart(editor, 0);
+        // get the current position of the cursor (absolute to editor)
+        const len = rng.toString().length
+        let tc    = editor.textContent ?? editor.innerText;
+        editor.innerHTML =
+            colorize(tc)
+            // fixes bug in chromium (wants 2 '\n's at the end of input for 1 '\n')
+            // and maybe firefox has the same issue too?...
+            + (tc.slice(-1) !== '\n' ? '\n' : '');
+        // restore the cursor's position, i.e. find which element and where the cursor must be put
+        let { node, position } = locate_cursor_pos(editor, len);
+        let range              = document.createRange();
+        sel.removeAllRanges();
+        range.setStart(node, position);
+        range.setEnd(node, position);
+        sel.addRange(range);
+    }
+
+    editor.addEventListener("input", input);
+
+    editor.addEventListener("paste", e => {
+        // some copy-paste text is not formatted correctly due to .textContent reading it incorrectly
+        // so the paste event is used as a workaround for this issue
+        e.preventDefault();
+        let txt =
+            (e.clipboardData || window.clipboardData).getData('text')
+                .replace(/\r/g, '');
+        let sel = window.getSelection();
+        let rng = sel.getRangeAt(0);
+        sel.deleteFromDocument();
+        rng.insertNode(document.createTextNode(txt));
+        rng.collapse(false);
+        input(e);
+    });
+
+    editor.addEventListener('keydown', e => {
+        if (e.key === "Tab" || (e.keyCode || e.which) === 9) {
+            e.preventDefault();
+            const sel = window.getSelection();
+            const rng = sel.getRangeAt(0);
+            const s   = document.createElement('span');
+            s.appendChild(document.createTextNode('\t'));
+            rng.deleteContents();
+            rng.insertNode(s);
+            rng.collapse(false);
+        }
+
+        // modified from SO answer: https://stackoverflow.com/a/20398132
+        if (e.key === "Enter" || (e.keyCode || e.which) === 13) {
+            e.preventDefault();
+            const sel = window.getSelection();
+            const rng = sel.getRangeAt(0);
+            const df  = document.createDocumentFragment();
+            df.appendChild(document.createTextNode('\n'));
+            rng.deleteContents();
+            rng.insertNode(df);
+            rng.collapse(false);
+            input(e); // cursor sometimes bounces when event is not triggered here
+        }
+    });
+
+    save_btn.addEventListener('click', async _ => {
+        if (waiting_for_link) {
+            notifs.set_type('n-info');
+            notifs.send("Whoa there! Wait up! Your link is getting prepared...");
+            return;
+        }
+        waiting_for_link = true;
+        let res = null;
+        try {
+            // TODO: add a name
+            res = await add(editor.textContent, play_name.value, null);
+            waiting_for_link = false;
+        } catch (e) {
+            notifs.set_type('n-err');
+            notifs.send(`Failed to add to database! ${e}`);
+            return;
+        }
+        let link = `${window.location.pathname}?i=${res.id}`;
+        window.history.replaceState(null, null, link);
+        let abs_link =
+            `${window.location.protocol}//${window.location.hostname}${window.location.port ? ":" + window.location.port : ""}` + link;
+
+        notifs.set_type('n-info');
+        const span = document.createElement('span');
+        let similar = "The link for this snippet is: ";
+        if (res?.match)
+            if (res.match === 'exact')
+                similar = "An exact entry already exists in the database, for which the link is: ";
+            else if (res.match === 'similar')
+                similar =
+                    "A similar entry (with a different name and same value) already exists in the database, for which the link is: ";
+        span.innerHTML =
+            `${similar}<span class="artificial-link">${abs_link}</span>. All entries expire after 30 days. Click to copy`;
+        const el = notifs.send(span);
+        // will never be null... but anyway
+        el?.addEventListener('click', async _ => {
+            try {
+                await navigator.clipboard.writeText(abs_link);
+                notifs.set_type('n-success');
+                notifs.send('Successfully copied link to clipboard!');
+            } catch (e) {
+                notifs.set_type('n-err');
+                notifs.send(
+                    'Failed to copy link to clipboard! Please try again, or enable sufficient permissions'
+                );
+                console.log("Failed to add to clipboard! Error", e);
             }
-        }
-    }
+        });
+    });
 
-    move_caret(_e) {
-        const e = get_e(_e)
-        // use set timeout because selection api sucks and, selection does
-        // not get registered directly during mousedown
-        setTimeout(() => this.update_selection(e), 1);
-    }
-
-    update_line_height() {
-        let line_height =
-            window.getComputedStyle(this.el)
-                .getPropertyValue('line-height');
-        this.caret.style.setProperty('--caret-height', `${parseFloat(line_height) * 0.92}px`);
-    }
-
-    focus_events(focused) {
-        let display = 'block';
-        if (!focused) {
-            display = 'none';
-            this.set_curr_line(null);
-        }
-        this.caret.style.display = display;
-    }
-
-    toggle_focus(_e) {
-        const e = get_e(_e);
-        const target = resolve_target(e);
-        if (target.closest(this.editor_class)) {
-            this.el.classList.add(this.focus_class);
-            this.focus_events(true);
-        } else {
-            this.el.classList.remove(this.focus_class);
-            this.focus_events(false);
-        }
-    }
-
-    run() {
-        this.focus_events(false);
-        this.el.append(this.caret);
-        this.lines.push(...this.el.querySelectorAll(this.line_class));
-        // wrap elements in a span, for proper z-indexing
-        for (const ln of this.lines) {
-            const wrapper = document.createElement("span");
-            const children = ln.childNodes ?? [];
-            wrapper.append(...children);
-            ln.append(wrapper);
-        }
-        this.lines = this.lines.reverse();
-        this.update_line_height();
-        this.blink();
-        this.el.addEventListener('mousedown', this.move_caret.bind(this));
-        document.addEventListener('mousedown', this.toggle_focus.bind(this));
-    }
-}
-
-const code = document.querySelector('.editor');
-const text_ed = new TextEditor(code);
-text_ed.run();
+    run_btn.addEventListener('click', _ => {
+        notifs.set_type('n-info');
+        notifs.send(
+            'Running the code does not do anything currently, since the language is not in a ready state.'
+        );
+    });
+})();

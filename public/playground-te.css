@@ -1,0 +1,114 @@
+/* Font imports */
+/* JetBrains Mono, Fira Code, Source Code pro, Roboto mono */
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&family=JetBrains+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800&family=Roboto+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=Source+Code+Pro:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+:root {
+    /* Code editor font styles */
+    --ff-fira-code   : 'Fira Code'      , monospace;
+    --ff-jb-mono     : 'JetBrains Mono' , monospace;
+    --ff-sourc-code  : 'Source Code Pro', monospace;
+    --ff-roboto-mono : 'Roboto Mono'    , monospace;
+    --ff-mono        :                    monospace;
+
+    --fs-code        : 14px;
+    --fw-code        : 400;
+
+    --ff-code        : var(--ff-jb-mono);
+    --code-rgb       : 251 241 199;
+    --code-lines     : rgba(var(--code-rgb) / 0.4);
+    --code-color     : rgb(var(--code-rgb));
+    --ed-term-color  : rgb(40 40 40);
+    --ed-cont-color  : rgb(45 45 45);
+
+    --caret-height   : var(--fs-code);
+    --line-no-width  : 3rem;
+    --editor-padding : 0.5rem;
+}
+
+.editor-container {
+    --gap            : 1rem;
+    padding          : 1rem;
+    flex-direction   : column;
+    height           : 100vh;
+    background-color : var(--ed-cont-color);
+}
+
+.editor, .terminal {
+    font-family       : var(--ff-code);
+    font-size         : var(--fs-code);
+    font-weight       : var(--fw-code);
+    padding           : var(--editor-padding);
+    border            : 0;
+    width             : 100%;
+    background-color  : var(--ed-term-color);
+    color             : var(--code-color);
+    border-radius     : 0.25rem;
+    overflow          : auto;
+    white-space       : pre;
+    box-shadow        : rgba(30 30 30 / 0.5) 0 0 .3rem .15rem;
+    counter-reset     : line;
+}
+
+.editor {
+    padding-left : calc(var(--editor-padding) + var(--line-no-width));
+    position     : relative;
+    flex-grow    : 3;
+}
+
+.editor:before {
+    content      : "";
+    top          : 0;
+    left         : 0;
+    position     : absolute;
+    height       : 100%;
+    width        : var(--line-no-width);
+    border-right : 1px solid var(--code-lines);
+}
+
+.terminal {
+    flex-grow : 2;
+}
+
+.caret {
+    background-color : var(--code-color);
+    width            : 1px;
+    position         : fixed;
+    height           : var(--caret-height);
+    transition       : opacity 0.05s ease;
+    pointer-events   : none;
+}
+
+.caret-blink {
+    opacity : 0;
+}
+
+.code-line:before {
+    counter-increment : line;
+    color             : var(--code-lines);
+    content           : counter(line);
+    position          : absolute;
+    display           : inline-block;
+    width             : var(--line-no-width);
+    text-align        : right;
+    padding           : 0 .5rem;
+    overflow          : hidden;
+    text-overflow     : ellipsis;
+    left              : 0;
+    z-index           : 1;
+}
+
+.line-focus span {
+    position: relative;
+    z-index: 1;
+}
+
+.line-focus:after {
+    content          : "";
+    left             : 0;
+    position         : absolute;
+    width            : 100%;
+    height           : calc(var(--lh-default) * var(--fs-code)) /* TODO: figure out a better way to calculate height */;
+    pointer-events   : none;
+    background-color : rgba(0 0 0 / 0.15);
+    z-index          : 0;
+}

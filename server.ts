@@ -1,11 +1,17 @@
 // oak server
-import { Application, Router, RouterContext, Context } from "https://deno.land/x/oak/mod.ts";
+import {Application, Context, Router, RouterContext, Status} from "https://deno.land/x/oak@v9.0.1/mod.ts";
+import * as sb from "./databases/sb-db.js"
 
-const prod = !!Deno.env.get("PROD");
-const db_url =
-    prod ?
-        'https://corul-playground-db-production.up.railway.app' :
-        'http://localhost:8080';
+const status = {
+    ok    : 'ok',
+    error : 'error'
+};
+
+// const prod = !!Deno.env.get("PROD");
+const db_url = 'https://corul-playground-db-production.up.railway.app';
+    // prod ?
+    //     'https://corul-playground-db-production.up.railway.app' :
+    //     'http://localhost:8080';
 const app = new Application();
 
 app.addEventListener("listen", ({ hostname , port, secure }) => {
@@ -41,7 +47,8 @@ app.use(async (ctx: Context, next) => {
 });
 
 const playground = async (ctx: RouterContext) => {
-    const playground = await Deno.readFile("./playground-ce.html");
+    // TODO: Change this route back to the main playground
+    const playground = await Deno.readFile("./routes/playground.html");
     ctx.response.headers =
         new Headers({
             'Content-Type': 'text/html'
@@ -55,70 +62,44 @@ const router =
     new Router()
         .get('/play', playground)
         .get('/playground', playground)
-        .post('/api/add', async (ctx) => {
-            const body = await ctx.request.body();
-            const val = await body.value;
-            if (val.text && val.name !== null) {
-                let value = val.text.trim();
-                let message = '';
-                if (value.length > max_value_len) {
-                    value = value.substring(0, max_value_len);
-                    message += 'value-overflow';
-                }
-                let name = val.name.trim();
-                if (name.length > max_title_len) {
-                    name = name.substring(0, max_title_len);
-                    message += 'title-overflow';
-                }
-                if (message === '') {
-                    try {
-                        const ftc = await fetch(`${db_url}/add/sb`, {
-                            method: 'POST',
-                            headers: { 'Content-Type':'application/json' },
-                            body: JSON.stringify({ name, value })
-                        });
-                        const data = await ftc.json();
-                        ctx.response.body = { status: 200, data: data.data.id, message: null };
-                    } catch (e) {
-                        console.log("Failed to add to DB: ", e);
-                        ctx.response.body = { status: 500, data: null, message: null };
-                    }
-                    return;
-                }
-                ctx.response.body = { status: 409, data: null, message };
+        .post('/api/add', async (ctx: RouterContext) => {
+            const body  = await ctx.request.body(),
+                  value = await body.value,
+                  text  = value?.text?.trim(),
+                  name  = value?.name?.trim();
+
+            if (!text || text?.length > max_value_len || name?.length > max_title_len) {
+                ctx.response.status = Status.BadRequest;
+                ctx.response.body = { status: status.error, data: null, error: null }
                 return;
             }
-            ctx.response.body = { status: 500, data: null, message: null };
+            const add = await sb.add(name, text);
+            ctx.response.status = Status.OK;
+            ctx.response.body = add;
         })
-        .post('/api/get', async (ctx) => {
-            const body = await ctx.request.body();
-            const val = await body.value;
-            const id = val.id;
-            if (id) {
-                try {
-                    const ftc = await fetch(`${db_url}/get/sb`, {
-                        method: 'POST',
-                        headers: {'Content-Type':'application/json'},
-                        body: JSON.stringify({ id })
-                    });
-                    const data = await ftc.json();
-                    if (data.status !== 'ok')
-                        ctx.response.body = { status: 404, data: data.error };
-                    else
-                        ctx.response.body = { status: 200, data: data.data };
-                    return;
-                } catch (e) {
-                    console.log("Failed to get from DB: ", e);
-                }
+        .post('/api/get', async ctx => {
+            const body  = await ctx.request.body();
+            const value = await body.value;
+            if (!value.id) {
+                ctx.response.status = Status.BadRequest;
+                ctx.response.body = { status: status.error, data: null, error: null }
+                return;
             }
-            ctx.response.body = { status: 500, data: null };
+            const get = await sb.get_id(value.id);
+            if (get?.error?.code === "22P02" /* uuid syntax invalid */ )
+                ctx.response.status = Status.BadRequest;
+            else if (get.status === status.error)
+                ctx.response.status = Status.NotFound;
+            else
+                ctx.response.status = Status.OK;
+            ctx.response.body = get;
         });
 
 app.use(router.routes());
 app.use(router.allowedMethods());
 
 app.use(async (ctx: Context) => {
-    const not_found = await Deno.readFile("./404.html");
+    const not_found = await Deno.readFile("./routes/404.html");
     ctx.response.headers =
         new Headers({
             'Content-Type': 'text/html'
