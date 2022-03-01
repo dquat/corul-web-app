@@ -13,6 +13,8 @@ import { locate_cursor_pos, load, add, default_input } from "./playground-utils.
           editor           = document.querySelector('.editor'),
           save_btn         = document.querySelector('.save'),
           run_btn          = document.querySelector('.run'),
+          theme_btn        = document.querySelector('.theme'),
+          settings_btn     = document.querySelector('.settings'),
           play_name        = document.querySelector('#playground-name'),
           highlights       = document.querySelectorAll('.highlight');
 
@@ -118,6 +120,7 @@ import { locate_cursor_pos, load, add, default_input } from "./playground-utils.
         try {
             // TODO: add a name
             res = await add(editor.textContent, play_name.value, null);
+            play_name.value = res.name;
             waiting_for_link = false;
         } catch (e) {
             notifs.set_type('n-err');
@@ -132,12 +135,11 @@ import { locate_cursor_pos, load, add, default_input } from "./playground-utils.
         notifs.set_type('n-info');
         const span = document.createElement('span');
         let similar = "The link for this snippet is: ";
-        if (res?.match)
-            if (res.match === 'exact')
-                similar = "An exact entry already exists in the database, for which the link is: ";
-            else if (res.match === 'similar')
-                similar =
-                    "A similar entry (with a different name and same value) already exists in the database, for which the link is: ";
+        if (res?.match === 'exact')
+            similar = "An exact entry already exists in the database, for which the link is: ";
+        else if (res?.match === 'similar')
+            similar =
+                "A similar entry (with a different name and same value) already exists in the database, for which the link is: ";
         span.innerHTML =
             `${similar}<span class="artificial-link">${abs_link}</span>. All entries expire after 30 days. Click to copy`;
         const el = notifs.send(span);
@@ -158,9 +160,23 @@ import { locate_cursor_pos, load, add, default_input } from "./playground-utils.
     });
 
     run_btn.addEventListener('click', _ => {
-        notifs.set_type('n-info');
+        notifs.set_type('n-warn');
         notifs.send(
             'Running the code does not do anything currently, since the language is not in a ready state.'
+        );
+    });
+
+    theme_btn.addEventListener('click', _ => {
+        notifs.set_type('n-warn');
+        notifs.send(
+            'The theme changer has not been implemented yet, but will be in the near future.'
+        );
+    });
+
+    settings_btn.addEventListener('click', _ => {
+        notifs.set_type('n-warn');
+        notifs.send(
+            'The settings pane is not currently implemented and will be implemented in future releases.'
         );
     });
 })();

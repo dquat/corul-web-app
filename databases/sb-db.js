@@ -1,7 +1,9 @@
 // xml http request polyfill
 import "https://deno.land/x/xhr@0.1.1/mod.ts";
 // supabase import
-import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+// import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+// esm might be better?
+import { createClient } from "https://esm.sh/@supabase/supabase-js?target=deno";
 
 import init, { random_name } from "../corul-wasm/pkg/corul_wasm.js";
 await init();

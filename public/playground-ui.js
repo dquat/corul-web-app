@@ -70,7 +70,6 @@ class UI {
     }
 
     move_to_tab({ id, el }) {
-        this.reset_tab();
         const sel_tab =
             el ? opener.querySelector('.' + el.id) : id ? opener.querySelector('.' + id) : null;
         if (sel_tab !== null) {
@@ -86,6 +85,7 @@ class UI {
             tab    .classList.add('selected');
             // this.reset_tab(false);
         } else {
+            this.reset_tab();
             for (const footer_btn of footer_children)
                 footer_btn.classList.remove('selected');
             main.classList.add('hide');
@@ -111,6 +111,7 @@ class UI {
         }
         if (window.innerHeight <= UI.MIN_HEIGHT || window.innerWidth <= UI.MIN_WIDTH) {
             this.window_small = true;
+            this.reset_tab();
             if (window.innerWidth <= UI.MIN_WIDTH) {
                 main.classList.remove('horizontal');
                 main.classList.add('vertical');
@@ -145,22 +146,22 @@ class UI {
     }
 
     resize_tab(e, type) {
+        // when using touch, resizing is sometimes laggy... wierd bug
         const root = document.documentElement;
         const cursor_style =
             resize_bar.style.cursor ||
             window.getComputedStyle(resize_bar).cursor;
         // touch event stuff
-        const orig_ev = e.originalEvent ?? e;
-        let touches = orig_ev?.touches || orig_ev?.changedTouches;
-        const touch = touches ? touches[0] : null;
-        const [ cx, cy ] = [
-            touch?.clientX || e.clientX || e.pageX || e.screenX,
-            touch?.clientY || e.clientY || e.pageY || e.screenY,
-        ];
+        const orig_ev    = e.originalEvent ?? e,
+              touches    = orig_ev?.touches || orig_ev?.changedTouches,
+              touch      = touches ? touches[0] : null,
+              [ cx, cy ] = [
+                  touch?.clientX || e.clientX || e.pageX || e.screenX,
+                  touch?.clientY || e.clientY || e.pageY || e.screenY,
+              ];
         switch (type) {
             case 'down': {
-                if(!e.type?.includes('touch'))
-                    e.preventDefault();
+                if(!e.type?.includes('touch')) e.preventDefault();
                 root.style.cursor = cursor_style;
                 this.resizing = true;
                 this.coords = { cx, cy };
@@ -168,8 +169,7 @@ class UI {
             break;
             case 'move': {
                 if (this.resizing && this.coords) {
-                    if(!e.type?.includes('touch'))
-                        e.preventDefault();
+                    if(!e.type?.includes('touch')) e.preventDefault();
                     const [ pcx, pcy ] = [ this.coords.cx, this.coords.cy ]
                     const [ ox, oy ] = [ pcx - cx, pcy - cy ];
                     const opener_cs = window.getComputedStyle(opener);
@@ -185,9 +185,7 @@ class UI {
                 }
             }
             break;
-            case 'up':
-            case 'leave':
-            case 'drag-end': {
+            case 'end': {
                 this.resizing = false;
                 root.style.cursor = 'auto';
             }
@@ -204,20 +202,19 @@ class UI {
         this.size_check();
         window.addEventListener('resize', this.size_check.bind(this));
         const t = this;
-        resize_bar.addEventListener('dragstart', e => e.preventDefault());
+        resize_bar.addEventListener('dragstart'  , e => e.preventDefault());
 
-        resize_bar.addEventListener('mousedown', e => t.resize_tab.call(t, e, 'down'));
-        window.addEventListener('touchstart', e => t.resize_tab.call(t, e, 'down'));
+        resize_bar.addEventListener('mousedown'  , e => t.resize_tab.call(t, e, 'down'));
+        resize_bar.addEventListener('touchstart' , e => t.resize_tab.call(t, e, 'down'));
 
-        window.addEventListener('mousemove', e => t.resize_tab.call(t, e, 'move'));
-        window.addEventListener('touchmove', e => t.resize_tab.call(t, e, 'move'));
+        window.addEventListener('mousemove'      , e => t.resize_tab.call(t, e, 'move'));
+        window.addEventListener('touchmove'      , e => t.resize_tab.call(t, e, 'move'));
 
-        window.addEventListener('mouseup', e => t.resize_tab.call(t, e, 'up'));
-        window.addEventListener('touchend', e => t.resize_tab.call(t, e, 'up'));
-
-        window.addEventListener('touchcancel', e => t.resize_tab.call(t, e, 'leave'));
-        window.addEventListener('mouseleave', e => t.resize_tab.call(t, e, 'leave'));
-        window.addEventListener('dragend', e => t.resize_tab.call(t, e, 'drag-end'));
+        window.addEventListener('mouseup'        , e => t.resize_tab.call(t, e, 'end'));
+        window.addEventListener('touchend'       , e => t.resize_tab.call(t, e, 'end'));
+        window.addEventListener('touchcancel'    , e => t.resize_tab.call(t, e, 'end'));
+        window.addEventListener('mouseleave'     , e => t.resize_tab.call(t, e, 'end'));
+        window.addEventListener('dragend'        , e => t.resize_tab.call(t, e, 'end'));
     }
 }
 // this variable can be used in other scripts
@@ -246,6 +243,18 @@ class Notification {
         this._time_cls  = time_class     || 'time-stamp';
         this._hour24    = false;
         this._type      = null;
+        this._root
+            .querySelector('.clear-all')
+            .addEventListener('click', _ => {
+            const children = this._root.querySelectorAll('.notification');
+            for (const child of children) child.remove();
+            if (!this._root.querySelector('.no-notif-plchldr')) {
+                const p = document.createElement('p');
+                p.classList.add('no-notif-plchldr');
+                p.textContent = 'No new notifications!';
+                this._root.append(p);
+            }
+        });
     }
 
     set_date_fmt(hour_24_format) {

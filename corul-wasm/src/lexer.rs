@@ -158,7 +158,7 @@ impl<'a> Lexer<'a> {
                             drop(self.it.next());
                             add(&mut s, tag!("range"), "..");
                         } else {
-                            add(&mut s, tag!("special"), ".");
+                            add(&mut s, tag!("operator"), ".");
                         }
                     } else {
                         add(&mut s, tag!("number"), str);
@@ -175,13 +175,15 @@ impl<'a> Lexer<'a> {
                     );
                     let tag = match (mode, KWS.contains(&str)) {
                         (_, true) => tag!("keyword"),
-                        (1, _) => tag!("fn-declaration"),
-                        (2, _) => tag!("variable-declaration"),
-                        _ => tag!("identifier"),
+                        (1, _)    => tag!("fn"),
+                        (2, _)    => tag!("variable"),
+                        (3, _)    => tag!("constant"),
+                        _         => tag!("identifier"),
                     };
-                    if mode != 2 || str != "mut" { mode = 0; }
-                    if str == "fn" { mode = 1; }
-                    if str == "let" || str == "const" { mode = 2; }
+                    if (mode != 2 && mode != 3) || str != "mut" { mode = 0; }
+                    if str == "fn"    { mode = 1; }
+                    if str == "let"   { mode = 2; }
+                    if str == "const" { mode = 3; }
                     add(&mut s, tag, str);
                 },
 
@@ -214,23 +216,38 @@ impl<'a> Lexer<'a> {
                         add(&mut s, tag!("comment"), &self.src[rng]);
                     }
                     else {
-                        s.push_str(tag!("special"));
+                        s.push_str(tag!("operator"));
                         s.push('/');
                         s.push_str(end);
                     }
                 }
 
                 c @ (
-                    '+' | '-' | '=' | ',' | '.' | '?' | '{' |
-                    '}' | '[' | ']' | '|' | '(' | ')' | '*' |
-                    '!' | '~' | '$' | '%' | '^' | ';' | ':'
+                    '+' | '-' | '=' | ',' | '?' | '{' | '}' |
+                    '[' | ']' | '|' | '(' | ')' | '*' | '!' |
+                    '~' | '$' | '%' | '^' | ';' | ':'
                 ) => {
                     mode = 0;
                     drop(self.it.next());
-                    s.push_str(tag!("special"));
+                    s.push_str(tag!("operator"));
                     s.push(c);
                     s.push_str(end);
                 },
+
+                '.' => {
+                    mode = 0;
+                    drop(self.it.next());
+                    if let Some((_, '.')) = self.it.peek() {
+                        drop(self.it.next());
+                        s.push_str(tag!("range"));
+                        s.push('.');
+                        s.push('.');
+                    } else {
+                        s.push_str(tag!("operator"));
+                        s.push('.');
+                    }
+                    s.push_str(end);
+                }
 
                 c @ ('&' | '<' | '>') => {
                     mode = 0;
@@ -239,7 +256,7 @@ impl<'a> Lexer<'a> {
                         '&' => "&amp;", '<' => "&lt;", '>' => "&gt;",
                         _ => unreachable!()
                     };
-                    s.push_str(tag!("special"));
+                    s.push_str(tag!("operator"));
                     s.push_str(&*esc.to_string());
                     s.push_str(end);
                 }

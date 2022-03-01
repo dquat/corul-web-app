@@ -39,6 +39,71 @@
     --thm-layout-color   : rgb(146 131 116); /* Color of the layout button */
     --thm-inp-border     : rgb(60 56 54); /* Color of border, on input elements */
     --thm-inp-fcs-border : rgb(68 104 141); /* Color of border, on input elements, when focused */
+
+    /* Notification styles */
+    --thm-notif-hlt-clr  : rgb(180 114 21); /* Color to change the notification so that the user gets alerted */
+    --thm-notif-clr      : rgb(30 30 30); /* Base notification color */
+    --thm-notif-tms      : rgb(45 45 45); /* Notification time-stamp color */
+    --thm-notif-info     : rgb(61 107 153); /* Notification info color */
+    --thm-notif-succcess : rgb(92 153 61); /* Notification success color */
+    --thm-notif-warn     : rgb(153 153 61); /* Notification warning color */
+    --thm-notif-error    : rgb(153 61 61); /* Notification warning color */
+
+    /* Code theme settings */
+    /* Keywords */
+    --thm-kwds-style     : italic;
+    --thm-kwds-weight    : 200;
+    --thm-kwds-color     : rgb(254 128 25);
+
+    /* Strings */
+    --thm-str-style      : normal;
+    --thm-str-weight     : normal;
+    --thm-str-color      : rgb(125 206 0);
+
+    /* Characters */
+    --thm-chr-style      : normal;
+    --thm-chr-weight     : normal;
+    --thm-chr-color      : rgb(125 206 0);
+
+    /* Numbers */
+    --thm-num-style      : italic;
+    --thm-num-weight     : normal;
+    --thm-num-color      : rgb(211 134 155);
+
+    /* Special characters / Operators */
+    --thm-oper-style     : normal;
+    --thm-oper-weight    : 400;
+    --thm-oper-color     : rgb(245 245 245);
+
+    /* Special characters / Operators */
+    --thm-rng-style     : normal;
+    --thm-rng-weight    : bold;
+    --thm-rng-color     : rgb(255 178 68);
+
+    /* Function calls and declarations */
+    --thm-fn-style       : italic;
+    --thm-fn-weight      : normal;
+    --thm-fn-color       : rgb(255 198 109);
+
+    /* Variable access & declarations */
+    --thm-var-style      : normal;
+    --thm-var-weight     : bold;
+    --thm-var-color      : rgb(214 220 175);
+
+    /* Constants access & declarations */
+    --thm-const-style    : normal;
+    --thm-const-weight   : bold;
+    --thm-const-color    : rgb(214 220 175);
+
+    /* Other identifiers */
+    --thm-ident-style    : normal;
+    --thm-ident-weight   : normal;
+    --thm-ident-color    : rgb(214 220 175);
+
+    /* Comments */
+    --thm-com-style      : italic;
+    --thm-com-weight     : 200;
+    --thm-com-color      : rgb(146 131 116);
 }
 
 /* Basic styles */
@@ -230,6 +295,8 @@ input[type=text]:focus {
     font-size        : var(--fs-code);
     white-space      : pre;
     overflow         : auto;
+    tab-size         : 4;
+    caret-color      : var(--thm-code-color);
 }
 
 /* Enforce code color */
@@ -245,7 +312,7 @@ input[type=text]:focus {
 
 /* Tool bars, and middle bar */
 .bar {
-    background-color: var(--thm-border-color);
+    background-color : var(--thm-border-color);
 }
 
 .horizontal .bar {
@@ -270,7 +337,7 @@ input[type=text]:focus {
 
 @media only screen and (max-width: 550px) {
     .tb-name {
-        display: none;
+        display : none;
     }
 }
 
@@ -291,7 +358,7 @@ input[type=text]:focus {
 }
 
 .footer-bar::-webkit-scrollbar {
-    display: none; /* Chromium */
+    display : none; /* Chromium */
 }
 
 .footer-bar {
@@ -337,45 +404,57 @@ input[type=text]:focus {
 
 /* Notifications */
 
+.notifications .clear-all {
+    padding       : 0.5rem;
+    border-radius : 0.25rem;
+    width         : 100%;
+    margin-bottom : 1rem;
+}
+
+@keyframes highlight {
+    25%, 75% {
+        background-color : var(--thm-notif-hlt-clr);
+    }
+}
+
 .notification {
+    overflow         : auto;
     padding          : 0.5rem;
     position         : relative;
     border-radius    : 0.25rem;
-    background-color : rgb(30 30 30);
+    background-color : var(--thm-notif-clr);
     display          : flex;
     margin-bottom    : 0.5rem;
+    animation        : highlight 1s ease;
+    transition       : background-color var(--transition-rate-default);
 }
 
 .n-success {
-    background-color : rgb(49 157 85);
+    background-color : var(--thm-notif-succcess);
 }
 
 .n-info {
-    background-color : rgb(30 120 150);
+    background-color : var(--thm-notif-info);
 }
 
 .n-warn {
-    background-color : rgb(171 153 48);
+    background-color : var(--thm-notif-warn);
 }
 
 .n-err {
-    background-color : rgb(169 35 35);
+    background-color : var(--thm-notif-error);
 }
 
 .notification .time-stamp {
-    align-self       : flex-start;
-    flex-shrink      : 3;
-    margin           : 0;
     padding          : 0.2rem;
     position         : relative;
     min-width        : fit-content;
+    width            : fit-content;
+    height           : 0%; /* Wierd trick, but prevents timestamp from becoming 100% height */
+    margin           : 0 0 0 auto;
     border-radius    : 0.2rem;
     font-size        : calc(var(--fs-default) * 0.8);
-    background-color : rgb(10 10 10);
-}
-
-.notification .message {
-    flex-grow        : 1;
+    background-color : var(--thm-notif-tms);
 }
 
 .notification * {
@@ -383,41 +462,72 @@ input[type=text]:focus {
 }
 
 .artificial-link {
-    text-decoration: underline;
+    text-decoration : underline;
 }
 
 /* Highlighter classes */
-.special {
-    color       : whitesmoke;
-    font-weight : 400;
+.operator {
+    color       : var(--thm-oper-color);
+    font-weight : var(--thm-oper-weight);
+    font-style  : var(--thm-oper-style);
 }
 
-.string, .char {
-    color : #7dce00;
+.string {
+    color       : var(--thm-str-color);
+    font-weight : var(--thm-str-weight);
+    font-style  : var(--thm-str-style);
+}
+
+.char {
+    color       : var(--thm-chr-color);
+    font-weight : var(--thm-chr-weight);
+    font-style  : var(--thm-chr-style);
 }
 
 .number {
-    color : #d3869b;
+    color       : var(--thm-num-color);
+    font-weight : var(--thm-num-weight);
+    font-style  : var(--thm-num-style);
 }
 
 .comment {
-    color      : #928374;
-    font-style : italic;
+    color       : var(--thm-com-color);
+    font-weight : var(--thm-com-weight);
+    font-style  : var(--thm-com-style);
 }
 
 .keyword {
-    color      : #fe8019;
-    font-style : italic;
+    color       : var(--thm-kwds-color);
+    font-style  : var(--thm-kwds-style);
+    font-weight : var(--thm-kwds-weight);
 }
 
-.identifier, .variable-declaration {
-    color : #d6dcaf;
+.identifier {
+    color       : var(--thm-ident-color);
+    font-weight : var(--thm-ident-weight);
+    font-style  : var(--thm-ident-style);
 }
 
-.fn-declaration {
-    color : #ffc66d;
+.fn {
+    color       : var(--thm-fn-color);
+    font-weight : var(--thm-fn-weight);
+    font-style  : var(--thm-fn-style);
 }
 
-.variable-declaration {
-    font-weight : 600;
+.variable {
+    color       : var(--thm-var-color);
+    font-weight : var(--thm-var-weight);
+    font-style  : var(--thm-var-style);
+}
+
+.constant {
+    color       : var(--thm-const-color);
+    font-weight : var(--thm-const-weight);
+    font-style  : var(--thm-const-style);
+}
+
+.range {
+    color       : var(--thm-rng-color);
+    font-weight : var(--thm-rng-weight);
+    font-style  : var(--thm-rng-style);
 }
