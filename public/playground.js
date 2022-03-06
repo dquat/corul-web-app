@@ -1,49 +1,231 @@
-// About innerHTML, I know it's bad and all, and I *will remove* it later on, when I implement
-// an actual colorizing function. For now, deal with it. Or, don't visit this website :)
-
-import init, { lex } from "./corul_wasm.js";
-
-import { locate_cursor_pos, load, add, default_input } from "./playground-utils.old.js";
+import init, { lex } from './corul_wasm.js';
+import {current_theme, load_default_theme, load_theme, thm_load_err} from './load_theme.js';
+import * as idb from './indexedDB.js';
+import {
+    add,
+    decode_unicode,
+    default_input,
+    encode_unicode,
+    formatted_stringify_JSON,
+    load,
+    locate_cursor_pos
+} from './playground-utils.js';
 
 (async () => {
 
     await init(); // initialize wasm
 
-    const _is_chrome       = !!window.chrome, // currently unused...
+    const _is_chrome       = !!window["chrome"], // currently unused...
           editor           = document.querySelector('.editor'),
           save_btn         = document.querySelector('.save'),
           run_btn          = document.querySelector('.run'),
           theme_btn        = document.querySelector('.theme'),
           settings_btn     = document.querySelector('.settings'),
           play_name        = document.querySelector('#playground-name'),
-          highlights       = document.querySelectorAll('.highlight');
+          themes           = document.querySelector('.themes'),
+          theme_btns       = document.querySelector('.theme-selector .btns'),
+          theme_modal      = document.querySelector('.theme-modal'),
+          theme_search     = document.querySelector('.theme-selector .theme-search'),
+          download_thm     = document.querySelector('.btns .btn.download'),
+          upload_thm       = document.querySelector('.btns .btn.upload');
 
-    let waiting_for_link   = false;
+    let   theme_opts       = document.querySelectorAll('.themes .theme-opt');
 
-    const colorize = input => lex(input);
 
-    for (const highlighter of highlights)
-        highlighter.innerHTML = colorize(highlighter.textContent);
+    const max_recommended_encoded_len = 2000,
+          thm_regex                   = /[\[\]()*!#$%^+={}|\\"'<>,/:;?@& ]/g;
 
-    const id = new URLSearchParams(window.location.search).get('i');
+    let waiting_for_link = false,
+        previous_theme   = current_theme,
+        custom_theme_key = null;
+
+    const check_load_err = () => {
+        if (thm_load_err) {
+            notifs.set_type('n-err');
+            switch (thm_load_err.error) {
+                case 'no-name':
+                    notifs.send('The theme that\'s currently selected has no name!');
+                    break;
+                case 'no-type':
+                    notifs.send('The theme that\'s currently selected has no type [only light or dark accepted]!');
+                    break;
+                case 'no-author':
+                    notifs.send('The theme that\'s currently selected has no author!');
+                    break;
+                default:
+                    notifs.send(`The theme that\'s currently selected has no style for the property: '${thm_load_err.value}'!`);
+                    break;
+            }
+        }
+    }
+
+    check_load_err();
+
+    const set_theme_modal = (open) => {
+        if (open) {
+            theme_modal.style.display = 'flex';
+            main.classList.add('blurred');
+        } else {
+            theme_modal.style.display = 'none';
+            main.classList.remove('blurred');
+        }
+    }
+
+    async function theme_select() {
+        const thm     = this.parentElement,
+              file    = thm.getAttribute('data-file'),
+              idb_key = thm.getAttribute('data-idb');
+        if (!file && !idb_key) return;
+        if (file)
+            await load_theme(file);
+        else {
+            try {
+                let json = await idb.getItem(idb_key);
+                if (!(json instanceof Object))
+                    json = JSON.parse(json);
+                await load_theme(json);
+                custom_theme_key = idb_key;
+            } catch (e) {
+                console.log('Failed to load theme! Error', e);
+            }
+        }
+        check_load_err();
+    }
+
+    const create_theme_opt = (thm_name, thm_author, thm_type, thm_file, idb_key = null) => {
+        const name_under   = thm_name  .replace(thm_regex, '_'),
+              author_under = thm_author.replace(thm_regex, '_'),
+              type_under   = thm_type  .replace(thm_regex, '_'),
+              theme_opt    = document.createElement('div'),
+              radio        = document.createElement('input'),
+              label        = document.createElement('label'),
+              name         = document.createElement('span'),
+              type         = document.createElement('span'),
+              author       = document.createElement('span');
+
+        const input_id = `${name_under}-${author_under}-${type_under}`;
+        if (document.querySelector('#' + input_id)) return;
+        if (thm_file)
+            theme_opt.setAttribute('data-file', thm_file);
+        else if (idb_key)
+            theme_opt.setAttribute('data-idb', idb_key);
+        theme_opt.classList.add('theme-opt');
+
+        radio.type = 'radio';
+        radio.name = 'theme-selector';
+        radio.id   = input_id;
+        if (current_theme?.url === thm_file)
+            radio.checked = true;
+        theme_opt.append(radio);
+
+        name  .textContent = thm_name;
+        type  .textContent = thm_type;
+        author.textContent = thm_author;
+
+        name  .classList.add('name');
+        type  .classList.add('type');
+        author.classList.add('author');
+
+        label.htmlFor = input_id;
+
+        label.append(name);
+        label.append(type);
+        label.append(author);
+        theme_opt.append(label);
+
+        radio.addEventListener('input', theme_select.bind(radio));
+
+        themes.append(theme_opt);
+    };
+
+    // fetch all available themes from server
+    let theme_items;
+    try {
+        const _thm_fetch = await fetch('/themes/.theme-map.generated.json', {
+           method: 'GET',
+           headers: { 'Accept': 'application/json' }
+        });
+        const fetched_themes = await _thm_fetch.json();
+
+        theme_items = fetched_themes.items;
+        for(const item of theme_items)
+            create_theme_opt(item.name, item.author, item.type, item.file);
+
+        theme_opts = document.querySelectorAll('.themes .theme-opt');
+    } catch (e) {
+        console.log('Failed to load themes! Reason:', e);
+    }
 
     try {
-        const then = Date.now();
-        const res = await load(id);
-        // should be true always if no errors occur during load, but still
-        if (res?.value)
-            editor.innerHTML = colorize(res.value);
-        if (res?.name)
-            play_name.value = res.name;
-        notifs.set_type("n-success");
-        notifs.send(`Loaded content successfully in ${Date.now() - then}ms!`);
+        let list = await idb.getItem('theme-key-list');
+        console.log(list);
+        list = idb.toJSON(list);
+        console.log(list[0]);
+        if (list)
+            for(const item of list) {
+                const json = idb.toJSON(await idb.getItem(item));
+                create_theme_opt(json.name, json.author, json.type, null, item);
+            }
+
+        theme_opts = document.querySelectorAll('.themes .theme-opt');
     } catch (e) {
-        if (e) {
-            notifs.set_type("n-err");
-            notifs.send(`Failed to load content! ${e}`);
-        }
-        editor.innerHTML = colorize(default_input);
+        console.log('Failed to load custom themes! Error', e);
     }
+
+    const colorize = input => {
+        // console.time('lex');
+        const lexed = lex(input);
+        // console.timeEnd('lex');
+        return lexed;
+    };
+
+    const load_default = async () => {
+        let text = await idb.getItem('editor-content');
+        if (text)
+            editor.innerHTML = colorize(text);
+        else
+            editor.innerHTML = colorize(default_input);
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get('i'),
+          b64 = params.get('b');
+    if (b64 || id)
+        editor.innerText = 'Loading content...';
+    if (b64) {
+        try {
+            const contents = decode_unicode(b64.replace(/ /g, '+'));
+            editor.innerHTML = colorize(contents);
+            notifs.set_type('n-success');
+            notifs.send('Loaded contents in URL successfully!');
+        } catch (e) {
+            if (e) {
+                console.error("Failed to convert URL to snippet:", e);
+                notifs.set_type('n-err');
+                notifs.send(`Failed to convert URL to snippet! The given URLs format is invalid!`);
+            }
+            await load_default();
+        }
+    } else {
+        try {
+            const then = Date.now();
+            const res = await load(id);
+            // should be true always if no errors occur during load, but still
+            if (res?.value)
+                editor.innerHTML = colorize(res.value);
+            if (res?.name)
+                play_name.value = res.name;
+            notifs.set_type('n-success');
+            notifs.send(`Loaded content successfully in ${ Date.now() - then }ms!`);
+        } catch (e) {
+            if (e) {
+                notifs.set_type('n-err');
+                notifs.send(`Failed to load content! ${ e }`);
+            }
+            await load_default();
+        }
+    }
+    editor.contentEditable = true;
 
     const input = _ => {
         const sel = window.getSelection();
@@ -51,7 +233,7 @@ import { locate_cursor_pos, load, add, default_input } from "./playground-utils.
         rng.setStart(editor, 0);
         // get the current position of the cursor (absolute to editor)
         const len = rng.toString().length
-        let tc    = editor.textContent ?? editor.innerText;
+        let   tc  = editor.textContent ?? editor.innerText;
         editor.innerHTML =
             colorize(tc)
             // fixes bug in chromium (wants 2 '\n's at the end of input for 1 '\n')
@@ -66,9 +248,13 @@ import { locate_cursor_pos, load, add, default_input } from "./playground-utils.
         sel.addRange(range);
     }
 
-    editor.addEventListener("input", input);
+    editor.addEventListener('input', input);
 
-    editor.addEventListener("paste", e => {
+    editor.addEventListener('keyup', async _ =>
+        await idb.setItem('editor-content', editor.textContent)
+    );
+
+    editor.addEventListener('paste', e => {
         // some copy-paste text is not formatted correctly due to .textContent reading it incorrectly
         // so the paste event is used as a workaround for this issue
         e.preventDefault();
@@ -84,23 +270,22 @@ import { locate_cursor_pos, load, add, default_input } from "./playground-utils.
     });
 
     editor.addEventListener('keydown', e => {
-        if (e.key === "Tab" || (e.keyCode || e.which) === 9) {
+        const sel = window.getSelection();
+        if (e.key === 'Tab' || (e.keyCode || e.which) === 9) {
             e.preventDefault();
-            const sel = window.getSelection();
-            const rng = sel.getRangeAt(0);
-            const s   = document.createElement('span');
-            s.appendChild(document.createTextNode('\t'));
+            const rng  = sel.getRangeAt(0),
+                  span = document.createElement('span');
+            span.appendChild(document.createTextNode('\t'));
             rng.deleteContents();
-            rng.insertNode(s);
+            rng.insertNode(span);
             rng.collapse(false);
         }
 
         // modified from SO answer: https://stackoverflow.com/a/20398132
-        if (e.key === "Enter" || (e.keyCode || e.which) === 13) {
+        if (e.key === 'Enter' || (e.keyCode || e.which) === 13) {
             e.preventDefault();
-            const sel = window.getSelection();
-            const rng = sel.getRangeAt(0);
-            const df  = document.createDocumentFragment();
+            const rng = sel.getRangeAt(0),
+                  df  = document.createDocumentFragment();
             df.appendChild(document.createTextNode('\n'));
             rng.deleteContents();
             rng.insertNode(df);
@@ -110,19 +295,57 @@ import { locate_cursor_pos, load, add, default_input } from "./playground-utils.
     });
 
     save_btn.addEventListener('click', async _ => {
+        const copy_link = (el, link) => {
+            el?.addEventListener('click', async _ => {
+                try {
+                    await navigator.clipboard.writeText(link);
+                    notifs.set_type('n-success');
+                    notifs.send('Successfully copied link to clipboard!');
+                } catch (e) {
+                    notifs.set_type('n-err');
+                    notifs.send(
+                        'Failed to copy link to clipboard! Please try again, or enable sufficient permissions.'
+                    );
+                    console.error('Failed to add to clipboard! Error', e);
+                }
+            });
+        }
+        const in_url = document.querySelector('#url');
+        if (in_url.checked) {
+            if (editor.textContent.length > max_recommended_encoded_len) {
+                notifs.set_type('n-warn');
+                notifs.send(
+                    `Storing more than ${ max_recommended_encoded_len } characters of code, encoded is not recommended. Please use the database to store the data instead.`
+                );
+            }
+            let gen_url = encode_unicode(editor.textContent);
+            let link = `${window.location.pathname}?b=${gen_url}`;
+            window.history.replaceState(null, null, link);
+            let abs_link =
+                `${window.location.protocol}//${window.location.hostname}${window.location.port ? ':' + window.location.port : ''}` + link;
+            notifs.set_type('n-info');
+            let el;
+            if (abs_link.length < 100)
+                el = notifs.send(`The link for this snippet is: ${abs_link}. Click to copy`);
+            else
+                el = notifs.send(`The link for this snippet is too long to display. Click to copy the link`);
+            copy_link(el, abs_link);
+            return;
+        }
         if (waiting_for_link) {
             notifs.set_type('n-info');
-            notifs.send("Whoa there! Wait up! Your link is getting prepared...");
+            notifs.send('Whoa there! Wait up! Your link is getting prepared...');
             return;
         }
         waiting_for_link = true;
         let res = null;
         try {
-            // TODO: add a name
             res = await add(editor.textContent, play_name.value, null);
-            play_name.value = res.name;
+            if (res?.name)
+                play_name.value = res.name;
             waiting_for_link = false;
         } catch (e) {
+            waiting_for_link = false;
             notifs.set_type('n-err');
             notifs.send(`Failed to add to database! ${e}`);
             return;
@@ -130,33 +353,19 @@ import { locate_cursor_pos, load, add, default_input } from "./playground-utils.
         let link = `${window.location.pathname}?i=${res.id}`;
         window.history.replaceState(null, null, link);
         let abs_link =
-            `${window.location.protocol}//${window.location.hostname}${window.location.port ? ":" + window.location.port : ""}` + link;
+            `${window.location.protocol}//${window.location.hostname}${window.location.port ? ':' + window.location.port : ''}` + link;
 
         notifs.set_type('n-info');
         const span = document.createElement('span');
-        let similar = "The link for this snippet is: ";
+        let similar = 'The link for this snippet is: ';
         if (res?.match === 'exact')
-            similar = "An exact entry already exists in the database, for which the link is: ";
+            similar = 'An exact entry already exists in the database, for which the link is: ';
         else if (res?.match === 'similar')
             similar =
-                "A similar entry (with a different name and same value) already exists in the database, for which the link is: ";
+                'A similar entry (with a different name and same value) already exists in the database, for which the link is: ';
         span.innerHTML =
-            `${similar}<span class="artificial-link">${abs_link}</span>. All entries expire after 30 days. Click to copy`;
-        const el = notifs.send(span);
-        // will never be null... but anyway
-        el?.addEventListener('click', async _ => {
-            try {
-                await navigator.clipboard.writeText(abs_link);
-                notifs.set_type('n-success');
-                notifs.send('Successfully copied link to clipboard!');
-            } catch (e) {
-                notifs.set_type('n-err');
-                notifs.send(
-                    'Failed to copy link to clipboard! Please try again, or enable sufficient permissions'
-                );
-                console.log("Failed to add to clipboard! Error", e);
-            }
-        });
+            `${similar}<span class='artificial-link'>${abs_link}</span>. All entries expire after 30 days. Click to copy`;
+        copy_link(notifs.send(span), abs_link);
     });
 
     run_btn.addEventListener('click', _ => {
@@ -166,17 +375,166 @@ import { locate_cursor_pos, load, add, default_input } from "./playground-utils.
         );
     });
 
-    theme_btn.addEventListener('click', _ => {
-        notifs.set_type('n-warn');
-        notifs.send(
-            'The theme changer has not been implemented yet, but will be in the near future.'
-        );
-    });
+    theme_btn.addEventListener('click', _ => set_theme_modal(true));
 
     settings_btn.addEventListener('click', _ => {
         notifs.set_type('n-warn');
         notifs.send(
             'The settings pane is not currently implemented and will be implemented in future releases.'
         );
+    });
+
+    theme_search.addEventListener('input', _ => {
+        const values =
+            theme_search
+                .value
+                .split(' ')
+                .filter(v => v.length > 0);
+        for(const opt of theme_opts) {
+            const label =
+                opt.querySelector('label')
+                    .textContent
+                    .toLowerCase();
+            let included = false,
+                valued   = false;
+            for (const value of values) {
+                valued = true;
+                if (label.includes(value)) {
+                    included = true;
+                    break;
+                }
+            }
+            if (!included && valued)
+                opt.style.display = 'none';
+            else
+                opt.style.display = 'flex';
+        }
+    });
+
+    theme_modal.addEventListener('click', e => {
+        if (!e.target.closest('.theme-selector'))
+            set_theme_modal(false);
+    });
+
+    const ok     = theme_btns.querySelector('.ok');
+    const cancel = theme_btns.querySelector('.cancel');
+
+    const find_theme = url => {
+        for (const opt of theme_opts) {
+            const input = opt.querySelector('input');
+            if (opt.hasAttribute('data-file'))
+                input.checked =
+                    opt.getAttribute('data-file') === url;
+            else if (opt.hasAttribute('data-idb'))
+                input.checked =
+                    opt.getAttribute('data-idb') === url;
+        }
+    }
+
+    const close_on_error = async () => {
+        const type = await load_default_theme();
+        set_theme_modal(false);
+        await find_theme(type);
+        custom_theme_key = null;
+    }
+
+    const close_thm_modal = async _ => {
+        if (thm_load_err) {
+            await close_on_error();
+            return;
+        }
+        set_theme_modal(false);
+        find_theme(previous_theme?.url ?? custom_theme_key);
+        if (
+            previous_theme?.name === current_theme?.name &&
+            previous_theme?.author === current_theme?.author &&
+            previous_theme?.type === current_theme?.type
+        ) return;
+        await load_theme(previous_theme?.value);
+        check_load_err();
+    };
+
+    ok.addEventListener('click', async _ => {
+        if (thm_load_err) {
+            await close_on_error();
+            return;
+        }
+        previous_theme = current_theme;
+        let selected = document.querySelector('input[type=radio][name=theme-selector]:checked');
+        if (selected?.parentElement?.hasAttribute('data-file')) {
+            await idb.setItem('custom-theme', false);
+            await idb.setItem('theme', current_theme.url);
+        } else if (custom_theme_key) {
+            await idb.setItem('custom-theme', true);
+            await idb.setItem('theme', custom_theme_key);
+        }
+        set_theme_modal(false);
+    });
+
+    cancel.addEventListener('click', close_thm_modal);
+
+    document.addEventListener('keydown', async e => {
+        if (e.key === 'Escape' || (e.keyCode || e.which) === 27)
+            await close_thm_modal();
+    });
+
+    download_thm.addEventListener('click', async _ => {
+        let theme       = current_theme.value;
+        theme.author    = '[add your name or nickname here]';
+        theme.type      = '[add the type of your theme here (light or dark only)]';
+        theme.name      = '[add the name of your theme here]';
+        const a         = document.createElement('a');
+        a.href          = "data:text/json;charset=utf-8," + encodeURIComponent(formatted_stringify_JSON(theme));
+        a.download      = `theme-${current_theme.author.replace(thm_regex, '-')}-${current_theme.name.replace(thm_regex, '-')}.json`;
+        a.hidden        = true;
+        a.style.display = 'none';
+        document.body.append(a);
+        a.click();
+        a.remove();
+    });
+
+    upload_thm.addEventListener('click', async e => {
+        const input         = document.createElement('input');
+        input.type          = 'file';
+        input.accept        = 'application/json';
+        input.hidden        = true;
+        input.style.display = 'none';
+        document.body.append(input);
+        input.click();
+        input.addEventListener('input', _ => {
+            const fr = new FileReader();
+            fr.readAsText(input.files[0]);
+            fr.onload = async e => {
+                try {
+                    const parsed = JSON.parse(e.target.result);
+                    if (parsed?.name?.length > 40) throw 'Theme name is too long!';
+                    if (parsed?.author?.length > 30) throw 'Author\'s name is too long!';
+                    if (!['light', 'dark'].includes(parsed?.type)) throw 'The type of theme specified is invalid (only light or dark)!';
+                    await load_theme(parsed);
+                    check_load_err();
+                    const idb_key = `theme-${parsed.name}-${parsed.author}-${parsed.type}`;
+                    create_theme_opt(parsed.name, parsed.author, parsed.type, null, idb_key);
+                    await idb.setItem(idb_key, parsed);
+                    try {
+                        let key_list = idb.toJSON(await idb.getItem('theme-key-list'));
+                        if (!key_list)
+                            key_list = [];
+                        if (!key_list.includes(idb_key))
+                            key_list.push(idb_key);
+                        await idb.setItem('theme-key-list', key_list);
+                        custom_theme_key = idb_key;
+                    } catch (e) {
+                        notifs.set_type('n-err');
+                        notifs.send('Failed to add custom theme! ' + e);
+                        console.log('Error adding to custom theme list! Error:', e);
+                    }
+                    theme_opts = document.querySelectorAll('.themes .theme-opt');
+                } catch (e) {
+                    notifs.set_type('n-err');
+                    notifs.send('Failed to add custom theme! ' + e);
+                    console.log('Error loading file:', e);
+                }
+            }
+        });
     });
 })();

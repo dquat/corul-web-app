@@ -3,9 +3,14 @@ use std::iter::Peekable;
 use std::ops::Range;
 use std::str::CharIndices;
 
-const KWS: [&'static str; 19] = [
+const KWS: [&'static str; 24] = [
     "true", "false", "for", "while", "loop", "if", "else", "const", "let", "fn", "return", "static",
-    "pub", "struct", "mut", "self", "impl", "match", "in"
+    "pub", "struct", "mut", "self", "impl", "match", "in", "use", "mod", "extern", "crate", "super"
+];
+
+const BLT_IN: [&'static str; 15] = [
+    "usize", "isize", "i64", "u64", "i32", "u32", "i16", "u16", "i8", "u8", "u128", "char",
+    "bool", "str", "String",
 ];
 
 // a simple little convenience macro
@@ -43,31 +48,49 @@ fn esc_c(ch: char) -> Option<&'static str> {
     }
 }
 
+fn take_while_rng(
+    it            : &mut Peekable<CharIndices>,
+    src_len       : usize,
+    mut predicate : impl FnMut(char) -> bool
+) -> Range<usize> {
+    let start = match it.peek() {
+        Some(&(i, _)) => i,
+        None => src_len
+    };
+    let mut end = start;
+    while let Some((_, c)) = it.next_if(|&(_, c)| predicate(c)) {
+        end += c.len_utf8();
+    }
+    start..end
+}
 
 pub struct Lexer<'a> {
     src: Cow<'a, str>,
     it: Peekable<CharIndices<'a>>,
+    vars: Vec<(String, u8)>,
 }
 
 impl<'a> Lexer<'a> {
     pub fn new(src: &'a str) -> Self {
         Lexer {
             src: Cow::Borrowed(src),
-            it: src.char_indices().peekable()
+            it: src.char_indices().peekable(),
+            vars: Vec::with_capacity(30), // a random number lol
         }
     }
 
     #[inline]
-    fn take_while_rng(&mut self, mut predicate: impl FnMut(char) -> bool) -> Range<usize> {
-        let start = match self.it.peek() {
-            Some(&(i, _)) => i,
-            None => self.src.len()
-        };
-        let mut end = start;
-        while let Some((_, c)) = self.it.next_if(|&(_, c)| predicate(c)) {
-            end += c.len_utf8();
-        }
-        start..end
+    fn take_while_rng(&mut self, predicate: impl FnMut(char) -> bool) -> Range<usize> {
+        take_while_rng(&mut self.it, self.src.len(), predicate)
+        // let start = match self.it.peek() {
+        //     Some(&(i, _)) => i,
+        //     None => self.src.len()
+        // };
+        // let mut end = start;
+        // while let Some((_, c)) = self.it.next_if(|&(_, c)| predicate(c)) {
+        //     end += c.len_utf8();
+        // }
+        // start..end
     }
 
     fn take_while(&mut self, predicate: impl FnMut(char) -> bool) -> &str {
@@ -77,6 +100,15 @@ impl<'a> Lexer<'a> {
 
     pub fn eof(&mut self) -> bool {
         self.it.peek().is_none()
+    }
+
+    fn contains_str(&self, str: &str, ty: u8) -> bool {
+        for (string, test_ty) in &self.vars {
+            if ty == *test_ty && string.eq(str) {
+                return true;
+            }
+        }
+        false
     }
 
     #[inline]
@@ -94,10 +126,11 @@ impl<'a> Lexer<'a> {
             };
             string.push_str(end);
         };
-        let mut mode = 0usize;
+        let mut mode = 0u8;
         // 0 -> nothing
-        // 1 -> function declaration
-        // 2 -> let variable declaration
+        // 1 -> functions
+        // 2 -> let variables
+        // 3 -> constants
         loop {
             if self.eof() { break; }
             let &(_, char) = self.it.peek().unwrap();
@@ -154,37 +187,65 @@ impl<'a> Lexer<'a> {
                     let str = &self.src[rng.start..rng.end];
                     if str.ends_with('.') {
                         add(&mut s, tag!("number"), &self.src[rng.start..rng.end - 1]);
-                        if let Some(&(_, '.')) = self.it.peek() {
-                            drop(self.it.next());
-                            add(&mut s, tag!("range"), "..");
-                        } else {
-                            add(&mut s, tag!("operator"), ".");
-                        }
+                        add(&mut s, tag!("operator"), ".");
                     } else {
                         add(&mut s, tag!("number"), str);
                     }
                 },
 
                 c if c.is_alphanumeric() || c == '_' => {
-                    let str = self.take_while(|c|
+                    let rng = self.take_while_rng(|c|
                             c.is_alphanumeric() ||
                             c == '_'            ||
                             c == '~'            ||
                             c == '#'            ||
                             c == '\''
                     );
+                    let mut it = self.it.clone();
+                    let str = &self.src[rng.start..rng.end];
                     let tag = match (mode, KWS.contains(&str)) {
                         (_, true) => tag!("keyword"),
-                        (1, _)    => tag!("fn"),
-                        (2, _)    => tag!("variable"),
-                        (3, _)    => tag!("constant"),
+                        // sadly, I must use to string cuz rust compiler became angry :(
+                        (1, _)    => { self.vars.push((str.to_string(), 0)); tag!("fn") },
+                        (2, _)    => { self.vars.push((str.to_string(), 1)); tag!("variable") },
+                        (3, _)    => { self.vars.push((str.to_string(), 2)); tag!("constant") },
                         _         => tag!("identifier"),
                     };
+
+                    let tag = if tag == tag!("identifier") {
+                        match BLT_IN.contains(&str) {
+                            true => tag!("built-in"),
+                            _    => tag,
+                        }
+                    } else { tag };
+
                     if (mode != 2 && mode != 3) || str != "mut" { mode = 0; }
                     if str == "fn"    { mode = 1; }
                     if str == "let"   { mode = 2; }
                     if str == "const" { mode = 3; }
-                    add(&mut s, tag, str);
+                    let mut found_paren = false;
+                    // there must be a way to shorten this repetitive code xD
+                    let _ = if self.contains_str(str, 0) {
+                        take_while_rng(&mut it, self.src.len(), |c| {
+                            if c.is_whitespace() { true }
+                            else if c == '(' { found_paren = true; false }
+                            else { false }
+                        });
+                    } else {};
+
+                    if found_paren {
+                        add(&mut s, tag!("fn"), str);
+                    } else if tag == tag!("identifier") {
+                        if self.contains_str(str, 1) {
+                            add(&mut s, tag!("variable"), str);
+                        } else if self.contains_str(str, 2) {
+                            add(&mut s, tag!("constant"), str);
+                        } else {
+                            add(&mut s, tag, str);
+                        }
+                    } else {
+                        add(&mut s, tag, str);
+                    }
                 },
 
                 '/' => {
@@ -225,7 +286,7 @@ impl<'a> Lexer<'a> {
                 c @ (
                     '+' | '-' | '=' | ',' | '?' | '{' | '}' |
                     '[' | ']' | '|' | '(' | ')' | '*' | '!' |
-                    '~' | '$' | '%' | '^' | ';' | ':'
+                    '~' | '$' | '%' | '^' | ';' | ':' | '.'
                 ) => {
                     mode = 0;
                     drop(self.it.next());
@@ -233,21 +294,6 @@ impl<'a> Lexer<'a> {
                     s.push(c);
                     s.push_str(end);
                 },
-
-                '.' => {
-                    mode = 0;
-                    drop(self.it.next());
-                    if let Some((_, '.')) = self.it.peek() {
-                        drop(self.it.next());
-                        s.push_str(tag!("range"));
-                        s.push('.');
-                        s.push('.');
-                    } else {
-                        s.push_str(tag!("operator"));
-                        s.push('.');
-                    }
-                    s.push_str(end);
-                }
 
                 c @ ('&' | '<' | '>') => {
                     mode = 0;

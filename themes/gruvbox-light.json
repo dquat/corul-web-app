@@ -1,0 +1,106 @@
+{
+    "name": "Gruvbox Light",
+    "author": "built-in",
+    "type": "light",
+    "theme": {
+        "main-color": "rgb(242 229 188)",
+        "code-color": "rgb(101 71 53)",
+        "caret-color": "rgb(101 71 53)",
+
+        "button-color": "rgb(242 229 188)",
+        "button-hover-color": "rgb(220 200 160)",
+        "button-press-color": "rgb(200 180 140)",
+        "button-disabled-color": "rgb(100 80 60)",
+        "settings-cog-button-color": "rgb(162 145 130)",
+        "run-button-color": "rgb(133, 135, 27)",
+        "save-button-color": "rgb(162 145 130)",
+        "theme-button-color": "rgb(162 145 130)",
+        "layout-button-color": "rgb(162 145 130)",
+
+
+        "shadow-color": "rgba(30 30 30 / 0.5)",
+        "editor-and-terminal-background": "rgb(242 229 188)",
+        "default-font-color": "rgb(80 70 45)",
+        "selection-background-color": "rgba(62 158 255 / 0.3)",
+        "border-color": "rgb(162 145 130)",
+        "input-focused-border-color": "rgba(30 100 200 / 0.5)",
+
+        "modal-color": "rgba(40 40 40 / 0.7)",
+        "modal-text-color": "rgb(235 219 170)",
+        "modal-filter": "blur(7px)",
+        "modal-tag-color": "rgb(30 30 30)",
+        "modal-selected-color": "rgba(0 0 0 / 0.2)",
+
+        "modal-ok-button-color": "rgb(40 60 110)",
+        "modal-ok-button-hover-color": "rgb(60 80 130)",
+        "modal-ok-button-press-color": "rgb(80 100 150)",
+
+        "modal-cancel-button-color": "rgb(110 40 40)",
+        "modal-cancel-button-hover-color": "rgb(130 40 40)",
+        "modal-cancel-button-press-color": "rgb(150 60 60)",
+
+        "notification-highlight-color": "rgb(180 114 21)",
+        "notification-color": "rgb(30 30 30)",
+        "notification-timestamp-color": "rgb(45 45 45)",
+        "notification-timestamp-text-color": "rgb(200 200 200)",
+        "notification-type-info-color": "rgb(70 110 200)",
+        "notification-type-success-color": "rgb(92 153 61)",
+        "notification-type-warn-color": "rgb(200 200 61)",
+        "notification-type-error-color": "rgb(200 61 61)",
+
+        "keywords-style": "normal",
+        "keywords-font-weight": "normal",
+        "keywords-color": "rgb(5 90 110)",
+        "keywords-decoration": "none",
+
+        "built-in-types-style": "normal",
+        "built-in-types-font-weight": "normal",
+        "built-in-types-color": "rgb(212 97 9)",
+        "built-in-types-decoration": "none",
+
+        "string-style": "normal",
+        "string-font-weight": "normal",
+        "string-color": "rgb(120 140 30)",
+        "string-decoration": "none",
+
+        "character-style": "normal",
+        "character-font-weight": "normal",
+        "character-color": "rgb(121 116 14)",
+        "character-decoration": "none",
+
+        "number-style": "italic",
+        "number-font-weight": "normal",
+        "number-color": "rgb(170 100 125)",
+        "number-decoration": "none",
+
+        "operator-style": "normal",
+        "operator-font-weight": "400",
+        "operator-color": "rgb(124 111 100)",
+        "operator-decoration": "none",
+
+        "function-style": "italic",
+        "function-font-weight": "normal",
+        "function-color": "rgb(181 118 20)",
+        "function-decoration": "none",
+
+        "variable-style": "normal",
+        "variable-font-weight": "bold",
+        "variable-color": "rgb(101 71 53)",
+        "variable-decoration": "none",
+
+        "constant-style": "italic",
+        "constant-font-weight": "bold",
+        "constant-color": "rgb(120 90 70)",
+        "constant-decoration": "none",
+
+        "identifier-style": "normal",
+        "identifier-font-weight": "normal",
+        "identifier-color": "rgb(101 71 53)",
+        "identifier-decoration": "none",
+
+        "comment-style": "italic",
+        "comment-font-weight": "normal",
+        "comment-color": "rgb(146 131 116)",
+        "comment-decoration": "none"
+    }
+}

@@ -12,7 +12,7 @@
 
     /* Basic style variables */
     --fs-code          : 14px;
-    --fw-code          : 200;
+    --fw-code          : normal;
     --ff-code          : var(--ff-jb-mono);
 
     --ed-term-padding  : 0.5rem; /* Editor & terminal padding */
@@ -20,90 +20,101 @@
     --tb-btn-size      : 1.6rem; /* Size of each button in the top bar */
     --bar-size         : 0.3rem; /* Width or height (depends on layout) of the resizer bar */
 
-    /* Theme colors */
-    --thm-main-color     : rgb(40 40 40); /* Main color of the theme, used the most */
-    --thm-code-color     : rgb(251 241 199); /* Default code color */
-    --thm-btn-color      : rgb(40 40 40); /* Default button color */
-    --thm-btn-hvr-color  : rgb(35 36 38); /* Button hovered */
-    --thm-btn-clk-color  : rgb(21 22 24);  /* Button pressed */
-    --thm-btn-dis-color  : rgb(60 60 60);  /* Button disabled */
-    --thm-shadow-color   : rgba(30 30 30 / 0.5); /* Main shadow color of the theme */
-    --thm-ed-term-bg     : rgb(40 40 40); /* Base color of editor and terminal */
-    --thm-fnt-color      : var(--fc-default); /* Base font color of everything except the editor & terminal */
-    --thm-sel-bg-color   : rgba(62 158 255 / 0.3); /* Background color when text is selected */
-    --thm-border-color   : rgb(115 110 91); /* Base border color of theme */
-    --thm-setting-color  : rgb(146 131 116); /* Color of the settings cog */
-    --thm-run-color      : rgb(184 187 38); /* Color of the run button */
-    --thm-save-color     : rgb(146 131 116); /* Color of the save button */
-    --thm-theme-color    : rgb(146 131 116); /* Color of the theme button */
-    --thm-layout-color   : rgb(146 131 116); /* Color of the layout button */
-    --thm-inp-border     : rgb(60 56 54); /* Color of border, on input elements */
-    --thm-inp-fcs-border : rgb(68 104 141); /* Color of border, on input elements, when focused */
+    /*!* Theme colors *!*/
+    /*--thm-main-color     : rgb(40 40 40); !* Main color of the theme, used the most *!*/
+    /*--thm-code-color     : rgb(235 219 170); !* Default code color *!*/
+    /*--thm-btn-color      : rgb(40 40 40); !* Default button color *!*/
+    /*--thm-btn-hvr-color  : rgb(35 36 38); !* Button hovered *!*/
+    /*--thm-btn-clk-color  : rgb(21 22 24);  !* Button pressed *!*/
+    /*--thm-btn-dis-color  : rgb(60 60 60);  !* Button disabled *!*/
+    /*--thm-shadow-color   : rgba(30 30 30 / 0.5); !* Main shadow color of the theme *!*/
+    /*--thm-ed-term-bg     : rgb(40 40 40); !* Base color of editor and terminal *!*/
+    /*--thm-fnt-color      : var(--fc-default); !* Base font color of everything except the editor & terminal *!*/
+    /*--thm-sel-bg-color   : rgba(62 158 255 / 0.3); !* Background color when text is selected *!*/
+    /*--thm-border-color   : rgb(115 110 91); !* Base border color of theme *!*/
+    /*--thm-setting-color  : rgb(146 131 116); !* Color of the settings cog *!*/
+    /*--thm-run-color      : rgb(184 187 38); !* Color of the run button *!*/
+    /*--thm-save-color     : rgb(146 131 116); !* Color of the save button *!*/
+    /*--thm-theme-color    : rgb(146 131 116); !* Color of the theme button *!*/
+    /*--thm-layout-color   : rgb(146 131 116); !* Color of the layout button *!*/
+    /*--thm-inp-border     : rgb(60 56 54); !* Color of border, on input elements *!*/
+    /*--thm-inp-fcs-border : rgb(68 104 141); !* Color of border, on input elements, when focused *!*/
 
-    /* Notification styles */
-    --thm-notif-hlt-clr  : rgb(180 114 21); /* Color to change the notification so that the user gets alerted */
-    --thm-notif-clr      : rgb(30 30 30); /* Base notification color */
-    --thm-notif-tms      : rgb(45 45 45); /* Notification time-stamp color */
-    --thm-notif-info     : rgb(61 107 153); /* Notification info color */
-    --thm-notif-succcess : rgb(92 153 61); /* Notification success color */
-    --thm-notif-warn     : rgb(153 153 61); /* Notification warning color */
-    --thm-notif-error    : rgb(153 61 61); /* Notification warning color */
+    /*!* Notification styles *!*/
+    /*--thm-notif-hlt-clr  : rgb(180 114 21); !* Color to change the notification so that the user gets alerted *!*/
+    /*--thm-notif-clr      : rgb(30 30 30); !* Base notification color *!*/
+    /*--thm-notif-tms      : rgb(45 45 45); !* Notification time-stamp color *!*/
+    /*--thm-notif-info     : rgb(61 107 153); !* Notification info color *!*/
+    /*--thm-notif-success : rgb(92 153 61); !* Notification success color *!*/
+    /*--thm-notif-warn     : rgb(153 153 61); !* Notification warning color *!*/
+    /*--thm-notif-error    : rgb(153 61 61); !* Notification warning color *!*/
 
-    /* Code theme settings */
-    /* Keywords */
-    --thm-kwds-style     : italic;
-    --thm-kwds-weight    : 200;
-    --thm-kwds-color     : rgb(254 128 25);
+    /*!* Code theme settings *!*/
+    /*!* Keywords *!*/
+    /*--thm-kwds-style     : italic;*/
+    /*--thm-kwds-weight    : 200;*/
+    /*--thm-kwds-color     : rgb(254 128 25);*/
+    /*--thm-kwds-dec       : none;*/
 
-    /* Strings */
-    --thm-str-style      : normal;
-    --thm-str-weight     : normal;
-    --thm-str-color      : rgb(125 206 0);
+    /*!* Built in types *!*/
+    /*--thm-blt-in-style   : normal;*/
+    /*--thm-blt-in-weight  : normal;*/
+    /*--thm-blt-in-color   : rgb(212 97 9);*/
+    /*--thm-blt-in-dec     : none;*/
 
-    /* Characters */
-    --thm-chr-style      : normal;
-    --thm-chr-weight     : normal;
-    --thm-chr-color      : rgb(125 206 0);
+    /*!* Strings *!*/
+    /*--thm-str-style      : normal;*/
+    /*--thm-str-weight     : normal;*/
+    /*--thm-str-color      : rgb(125 206 0);*/
+    /*--thm-str-dec        : none;*/
 
-    /* Numbers */
-    --thm-num-style      : italic;
-    --thm-num-weight     : normal;
-    --thm-num-color      : rgb(211 134 155);
+    /*!* Characters *!*/
+    /*--thm-chr-style      : normal;*/
+    /*--thm-chr-weight     : normal;*/
+    /*--thm-chr-color      : rgb(125 206 0);*/
+    /*--thm-chr-dec        : none;*/
 
-    /* Special characters / Operators */
-    --thm-oper-style     : normal;
-    --thm-oper-weight    : 400;
-    --thm-oper-color     : rgb(245 245 245);
+    /*!* Numbers *!*/
+    /*--thm-num-style      : italic;*/
+    /*--thm-num-weight     : normal;*/
+    /*--thm-num-color      : rgb(211 134 155);*/
+    /*--thm-num-dec        : none;*/
 
-    /* Special characters / Operators */
-    --thm-rng-style     : normal;
-    --thm-rng-weight    : bold;
-    --thm-rng-color     : rgb(255 178 68);
+    /*!* Special characters / Operators *!*/
+    /*--thm-oper-style     : normal;*/
+    /*--thm-oper-weight    : 400;*/
+    /*--thm-oper-color     : rgb(245 245 245);*/
+    /*--thm-oper-dec       : none;*/
 
-    /* Function calls and declarations */
-    --thm-fn-style       : italic;
-    --thm-fn-weight      : normal;
-    --thm-fn-color       : rgb(255 198 109);
+    /*!* Function calls and declarations *!*/
+    /*--thm-fn-style       : italic;*/
+    /*--thm-fn-weight      : normal;*/
+    /*--thm-fn-color       : rgb(255 198 109);*/
+    /*--thm-fn-dec         : none;*/
 
-    /* Variable access & declarations */
-    --thm-var-style      : normal;
-    --thm-var-weight     : bold;
-    --thm-var-color      : rgb(214 220 175);
+    /*!* Variable access & declarations *!*/
+    /*--thm-var-style      : normal;*/
+    /*--thm-var-weight     : bold;*/
+    /*--thm-var-color      : rgb(214 220 175);*/
+    /*--thm-var-dec        : none;*/
 
-    /* Constants access & declarations */
-    --thm-const-style    : normal;
-    --thm-const-weight   : bold;
-    --thm-const-color    : rgb(214 220 175);
+    /*!* Constants access & declarations *!*/
+    /*--thm-const-style    : italic;*/
+    /*--thm-const-weight   : bold;*/
+    /*--thm-const-color    : rgb(241 248 197);*/
+    /*--thm-const-dec      : none;*/
 
-    /* Other identifiers */
-    --thm-ident-style    : normal;
-    --thm-ident-weight   : normal;
-    --thm-ident-color    : rgb(214 220 175);
+    /*!* Other identifiers *!*/
+    /*--thm-ident-style    : normal;*/
+    /*--thm-ident-weight   : normal;*/
+    /*--thm-ident-color    : rgb(214 220 175);*/
+    /*--thm-ident-dec      : none;*/
 
-    /* Comments */
-    --thm-com-style      : italic;
-    --thm-com-weight     : 200;
-    --thm-com-color      : rgb(146 131 116);
+    /*!* Comments *!*/
+    /*--thm-com-style      : italic;*/
+    /*--thm-com-weight     : 200;*/
+    /*--thm-com-color      : rgb(146 131 116);*/
+    /*--thm-com-dec        : none;*/
 }
 
 /* Basic styles */
@@ -177,16 +188,19 @@
 
 input[type=text] {
     display       : block;
-    max-width     : 50em;
     width         : 100%;
     outline       : none;
     border        : none;
     border-radius : 1px;
-    box-shadow    : var(--thm-inp-border) 0 0 1px 1px;
+    box-shadow    : var(--thm-border-color) 0 0 1px 1px;
 }
 
 input[type=text]:focus {
     box-shadow : var(--thm-inp-fcs-border) 0 0 1px 3px;
+}
+
+#playground-name {
+    max-width : 50em;
 }
 
 .no-notif-plchldr {
@@ -200,7 +214,7 @@ input[type=text]:focus {
     border-bottom : 2px solid var(--thm-border-color);
 }
 
-.tab-heading {
+.heading {
     margin     : 1rem 0 0;
     text-align : center;
 }
@@ -300,12 +314,13 @@ input[type=text]:focus {
     white-space      : pre;
     overflow         : auto;
     tab-size         : 4;
-    caret-color      : var(--thm-code-color);
+    caret-color      : var(--thm-caret-color);
 }
 
 /* Enforce code color */
 .editor, .editor * {
-    color : var(--thm-code-color);
+    color            : var(--thm-code-color);
+    background-color : var(--thm-ed-term-bg);
 }
 
 .editor {
@@ -368,7 +383,7 @@ input[type=text]:focus {
 .footer-bar {
     overflow           : auto;
     -ms-overflow-style : none;  /* IE and Edge */
-    scrollbar-width    : none;  /* Firefox */
+    scrollbar-width    : none;  /* Firefox */ /* Make scroll bar visible but thin? */
     grid-area          : footer;
     line-height        : 0;
 }
@@ -426,7 +441,7 @@ input[type=text]:focus {
     padding          : 0.5rem;
     position         : relative;
     border-radius    : 0.25rem;
-    background-color : var(--thm-notif-clr);
+    color            : var(--thm-notif-clr);
     display          : flex;
     margin-bottom    : 0.5rem;
     animation        : highlight 1s ease;
@@ -434,7 +449,7 @@ input[type=text]:focus {
 }
 
 .n-success {
-    background-color : var(--thm-notif-succcess);
+    background-color : var(--thm-notif-success);
 }
 
 .n-info {
@@ -449,6 +464,11 @@ input[type=text]:focus {
     background-color : var(--thm-notif-error);
 }
 
+.notification * {
+    background-color : transparent;
+    color            : var(--thm-notif-clr);
+}
+
 .notification .time-stamp {
     padding          : 0.2rem;
     position         : relative;
@@ -459,10 +479,7 @@ input[type=text]:focus {
     border-radius    : 0.2rem;
     font-size        : calc(var(--fs-default) * 0.8);
     background-color : var(--thm-notif-tms);
-}
-
-.notification * {
-    background-color : transparent;
+    color            : var(--thm-notif-tms-tc);
 }
 
 .artificial-link {
@@ -471,67 +488,230 @@ input[type=text]:focus {
 
 /* Highlighter classes */
 .operator {
-    color       : var(--thm-oper-color);
-    font-weight : var(--thm-oper-weight);
-    font-style  : var(--thm-oper-style);
+    color            : var(--thm-oper-color);
+    font-weight      : var(--thm-oper-weight);
+    font-style       : var(--thm-oper-style);
+    text-decoration  : var(--thm-oper-dec);
 }
 
 .string {
-    color       : var(--thm-str-color);
-    font-weight : var(--thm-str-weight);
-    font-style  : var(--thm-str-style);
+    color            : var(--thm-str-color);
+    font-weight      : var(--thm-str-weight);
+    font-style       : var(--thm-str-style);
+    text-decoration  : var(--thm-str-dec);
 }
 
 .char {
-    color       : var(--thm-chr-color);
-    font-weight : var(--thm-chr-weight);
-    font-style  : var(--thm-chr-style);
+    color            : var(--thm-chr-color);
+    font-weight      : var(--thm-chr-weight);
+    font-style       : var(--thm-chr-style);
+    text-decoration  : var(--thm-chr-dec);
 }
 
 .number {
-    color       : var(--thm-num-color);
-    font-weight : var(--thm-num-weight);
-    font-style  : var(--thm-num-style);
+    color            : var(--thm-num-color);
+    font-weight      : var(--thm-num-weight);
+    font-style       : var(--thm-num-style);
+    text-decoration  : var(--thm-num-dec);
 }
 
 .comment {
-    color       : var(--thm-com-color);
-    font-weight : var(--thm-com-weight);
-    font-style  : var(--thm-com-style);
+    color            : var(--thm-com-color);
+    font-weight      : var(--thm-com-weight);
+    font-style       : var(--thm-com-style);
+    text-decoration  : var(--thm-com-dec);
 }
 
 .keyword {
-    color       : var(--thm-kwds-color);
-    font-style  : var(--thm-kwds-style);
-    font-weight : var(--thm-kwds-weight);
+    color           : var(--thm-kwds-color);
+    font-style      : var(--thm-kwds-style);
+    font-weight     : var(--thm-kwds-weight);
+    text-decoration : var(--thm-kwds-dec);
+}
+
+.built-in {
+    color           : var(--thm-blt-in-color);
+    font-style      : var(--thm-blt-in-style);
+    font-weight     : var(--thm-blt-in-weight);
+    text-decoration : var(--thm-blt-in-dec);
 }
 
 .identifier {
-    color       : var(--thm-ident-color);
-    font-weight : var(--thm-ident-weight);
-    font-style  : var(--thm-ident-style);
+    color            : var(--thm-ident-color);
+    font-weight      : var(--thm-ident-weight);
+    font-style       : var(--thm-ident-style);
+    text-decoration  : var(--thm-ident-dec);
 }
 
 .fn {
-    color       : var(--thm-fn-color);
-    font-weight : var(--thm-fn-weight);
-    font-style  : var(--thm-fn-style);
+    color            : var(--thm-fn-color);
+    font-weight      : var(--thm-fn-weight);
+    font-style       : var(--thm-fn-style);
+    text-decoration  : var(--thm-fn-dec);
 }
 
 .variable {
-    color       : var(--thm-var-color);
-    font-weight : var(--thm-var-weight);
-    font-style  : var(--thm-var-style);
+    color            : var(--thm-var-color);
+    font-weight      : var(--thm-var-weight);
+    font-style       : var(--thm-var-style);
+    text-decoration  : var(--thm-var-dec);
 }
 
 .constant {
-    color       : var(--thm-const-color);
-    font-weight : var(--thm-const-weight);
-    font-style  : var(--thm-const-style);
+    color            : var(--thm-const-color);
+    font-weight      : var(--thm-const-weight);
+    font-style       : var(--thm-const-style);
+    text-decoration  : var(--thm-const-dec);
 }
 
-.range {
-    color       : var(--thm-rng-color);
-    font-weight : var(--thm-rng-weight);
-    font-style  : var(--thm-rng-style);
+/* Theme selector modal styles */
+
+.theme-modal {
+    width                   : 100%;
+    height                  : 100%;
+    background-color        : var(--thm-modal-color);
+    position                : fixed;
+    top                     : 0;
+    left                    : 0;
+    z-index                 : 10;
+    flex-direction          : column;
+}
+
+.blurred {
+    filter : var(--thm-modal-bd-filter);
+}
+
+.theme-modal * {
+    color : var(--thm-modal-txt-color);
+}
+
+@media only screen and (max-width: 300px) {
+    .theme-selector {
+        height     : 100%;
+        max-height : 100%;
+    }
+
+    .theme-selector .btns {
+        flex-direction : column;
+    }
+}
+
+.theme-selector {
+    overflow         : auto;
+    width            : 100%;
+    max-width        : 600px;
+    height           : 100%;
+    max-height       : 400px;
+    margin           : auto;
+    padding          : 0.5rem;
+    background-color : transparent;
+    flex-direction   : column;
+}
+
+.theme-selector *:not(.btns .btn, label .type, label .author) {
+    background-color : transparent;
+}
+
+/*.theme-selector .theme-opt:first-of-type {*/
+/*    border-top: var(--thm-border-color) solid 1px;*/
+/*}*/
+
+.themes {
+    overflow   : auto;
+    margin-top : 1rem;
+    width      : 100%;
+    max-height : 100%;
+}
+
+.theme-opt {
+    width         : 100%;
+    padding       : 0.5rem;
+    border-bottom : var(--thm-border-color) solid 1px;
+    position      : relative;
+    display       : flex;
+    align-items   : center;
+    overflow      : auto;
+}
+
+.theme-opt label {
+    width       : 100%;
+    display     : flex;
+    align-items : center;
+    gap         : 0.5rem;
+}
+
+.theme-opt label .type, .theme-opt label .author {
+    padding          : 0.4rem;
+    background-color : var(--thm-modal-tag-color);
+    border-radius    : 0.25rem;
+    /*min-width        : fit-content;*/
+    user-select      : none;
+}
+
+.theme-opt label .type {
+    margin-left : auto;
+}
+
+.theme-opt input:before {
+    content          : "";
+    position         : absolute;
+    background-color : transparent;
+    top              : 0;
+    left             : 0;
+    z-index          : -1;
+    width            : 100%;
+    height           : 100%;
+}
+
+.theme-opt input:checked:before  {
+    background-color : var(--thm-modal-sltd-color);
+}
+
+.theme-search {
+    text-align : center;
+}
+
+.theme-modal .btns {
+    flex-direction  : row;
+    gap             : 0.5rem;
+    justify-content : center;
+    align-items     : center;
+    width           : 100%;
+    margin-top      : auto;
+}
+
+.theme-modal .btns .btn {
+    width            : 100%;
+    padding          : 0.5rem;
+    border-radius    : 0.25rem;
+}
+
+.theme-modal .btns .btn:not(.ok, .cancel) {
+    color : var(--thm-fnt-color);
+}
+
+/* Ok button styling */
+.theme-modal .btns .btn.ok {
+    background-color : var(--thm-modal-ok-btn-color);
+}
+
+.theme-modal .btns .btn.ok:hover {
+    background-color : var(--thm-modal-ok-btn-hvr-color);
+}
+
+.theme-modal .btns .btn.ok:active {
+    background-color : var(--thm-modal-ok-btn-clk-color);
+}
+
+/* Cancel button styling */
+.theme-modal .btns .btn.cancel {
+    background-color : var(--thm-modal-cancel-btn-color);
+}
+
+.theme-modal .btns .btn.cancel:hover {
+    background-color : var(--thm-modal-cancel-btn-hvr-color);
+}
+
+.theme-modal .btns .btn.cancel:active {
+    background-color : var(--thm-modal-cancel-btn-clk-color);
 }

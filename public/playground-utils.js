@@ -13,17 +13,18 @@ export const default_input =
 
 // Here's a sample Rust program, for you to edit while you're here
 // or if you're the enthusiastic kind, waiting for me to finish my language.
+const X: usize = 10;
 fn main() {
 \tprintln!("Starting program...");
-\tconst x = 10;
 \t// always runs
-\tif x == 10 {
+\tif X == 10 {
 \t\tprintln!("x is ten.");
-\t\tlet y = x - 10; // y is 0 because x is 10
+\t\tlet y: usize = X - 10; // y is 0 because x is 10
 \t\tprintln!("y is zero!");
+\t} else { // well, this can't ever happen!
+\t\tmain();
 \t}
-}\n
-`;
+}`;
 
 export function locate_cursor_pos(root, index) {
     // borrowed from SO answer: https://stackoverflow.com/a/38479462
@@ -87,7 +88,6 @@ export async function load(id) {
 export async function add(value, name) {
     if (!value)
         throw "Expected the editor to contain code, but it is empty! Please add code to store.";
-
     let res = null;
     try {
         res = await fetch("/api/add", {
@@ -123,4 +123,42 @@ export async function add(value, name) {
     else
         // should ideally never reach here
         throw "A server error occurred! Please try again later.";
+}
+
+// this is borrowed from: https://stackoverflow.com/a/30106551
+export function encode_unicode(str) {
+    return window.btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, function(match, p1) {
+        return String.fromCharCode('0x' + p1);
+    }));
+}
+// so is this
+export function decode_unicode(str) {
+    return decodeURIComponent(atob(str).split('').map(function (c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+}
+
+// a simple JSON stringifier, that formats JSON files. Some things won't be formatted correctly since they've not been
+// implemented as they are outside scope of this project
+export function formatted_stringify_JSON(json, depth = 1) {
+    let accumulated = '';
+    const dps = '    '.repeat(depth);
+    accumulated += (depth <= 1 ? '    '.repeat(depth - 1) : '') + '{\n';
+    for (const [key, value] of Object.entries(json)) {
+        if (value instanceof Array) {
+            let value_string = value
+                .map(v => `"${v}", `)
+                .join('')
+                .slice(0, -2);
+            accumulated += dps + `"${key}": [ ${value_string} ],\n`;
+        } else if (value instanceof Object) {
+            accumulated += dps + `"${key}": ` +
+                formatted_stringify_JSON(value, depth + 1) + ',\n';
+        } else {
+            accumulated += dps + `"${key}": "${value}",\n`;
+        }
+    }
+    accumulated = accumulated.slice(0, -2) + '\n';
+    accumulated += '    '.repeat(depth - 1) + '}';
+    return accumulated;
 }

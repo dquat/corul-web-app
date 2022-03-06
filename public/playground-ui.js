@@ -205,16 +205,36 @@ class UI {
         resize_bar.addEventListener('dragstart'  , e => e.preventDefault());
 
         resize_bar.addEventListener('mousedown'  , e => t.resize_tab.call(t, e, 'down'));
-        resize_bar.addEventListener('touchstart' , e => t.resize_tab.call(t, e, 'down'));
+        resize_bar.addEventListener('touchstart' , e => t.resize_tab.call(t, e, 'down'),
+            { passive: true }); // apparently passive improves performance? (lighthouse)
+        // it does seem to remove that "laggy bug" that occurs when using touch to resize the tab
 
         window.addEventListener('mousemove'      , e => t.resize_tab.call(t, e, 'move'));
-        window.addEventListener('touchmove'      , e => t.resize_tab.call(t, e, 'move'));
+        window.addEventListener('touchmove'      , e => t.resize_tab.call(t, e, 'move'),
+            { passive: true });
 
         window.addEventListener('mouseup'        , e => t.resize_tab.call(t, e, 'end'));
-        window.addEventListener('touchend'       , e => t.resize_tab.call(t, e, 'end'));
-        window.addEventListener('touchcancel'    , e => t.resize_tab.call(t, e, 'end'));
+        window.addEventListener('touchend'       , e => t.resize_tab.call(t, e, 'end'),
+            { passive: true });
+        window.addEventListener('touchcancel'    , e => t.resize_tab.call(t, e, 'end'),
+            { passive: true });
         window.addEventListener('mouseleave'     , e => t.resize_tab.call(t, e, 'end'));
         window.addEventListener('dragend'        , e => t.resize_tab.call(t, e, 'end'));
+
+        const db  = document.querySelector('#db'),
+              url = document.querySelector("#url");
+
+        db.addEventListener('input', _ =>
+            localStorage.setItem('db-mode', db.checked.toString())
+        );
+        url.addEventListener('input', _ =>
+            localStorage.setItem('db-mode', (!url.checked).toString())
+        );
+
+        if (localStorage.getItem('db-mode') === 'false') {
+            db.checked  = false;
+            url.checked = true;
+        }
     }
 }
 // this variable can be used in other scripts

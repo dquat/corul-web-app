@@ -1,0 +1,105 @@
+{
+    "name": "One Light",
+    "author": "built-in",
+    "type": "light",
+    "theme": {
+        "main-color": "rgb(250, 250, 250)",
+        "code-color": "rgb(80 85 95)",
+        "caret-color": "rgb(80 85 95)",
+
+        "button-color": "rgb(250, 250, 250)",
+        "button-hover-color": "rgb(230, 230, 230)",
+        "button-press-color": "rgb(210, 210, 210)",
+        "button-disabled-color": "rgb(100, 100, 100)",
+        "settings-cog-button-color": "rgb(130 135 145)",
+        "run-button-color": "rgb(184 187 60)",
+        "save-button-color": "rgb(130 135 145)",
+        "theme-button-color": "rgb(130 135 145)",
+        "layout-button-color": "rgb(130 135 145)",
+
+        "shadow-color": "rgba(30 30 30 / 0.5)",
+        "editor-and-terminal-background": "rgb(250, 250, 250)",
+        "default-font-color": "rgb(63 65 72)",
+        "selection-background-color": "rgba(62 158 255 / 0.3)",
+        "border-color": "rgb(117 118 122)",
+        "input-focused-border-color": "rgba(30 100 250 / 0.5)",
+
+        "modal-color": "rgba(40 40 40 / 0.7)",
+        "modal-text-color": "rgb(180 185 195)",
+        "modal-filter": "blur(7px)",
+        "modal-tag-color": "rgb(30 30 30)",
+        "modal-selected-color": "rgba(0 0 0 / 0.2)",
+
+        "modal-ok-button-color": "rgb(40 60 110)",
+        "modal-ok-button-hover-color": "rgb(60 80 130)",
+        "modal-ok-button-press-color": "rgb(80 100 150)",
+
+        "modal-cancel-button-color": "rgb(110 40 40)",
+        "modal-cancel-button-hover-color": "rgb(130 40 40)",
+        "modal-cancel-button-press-color": "rgb(150 60 60)",
+
+        "notification-highlight-color": "rgb(180 114 21)",
+        "notification-color": "rgb(50 50 50)",
+        "notification-timestamp-color": "rgb(45 45 45)",
+        "notification-timestamp-text-color": "rgb(230 230 230)",
+        "notification-type-info-color": "rgb(80 120 210)",
+        "notification-type-success-color": "rgb(120 180 80)",
+        "notification-type-warn-color": "rgb(210 210 60)",
+        "notification-type-error-color": "rgb(210 60 60)",
+
+        "keywords-style": "normal",
+        "keywords-font-weight": "normal",
+        "keywords-color": "rgb(166 50 164)",
+        "keywords-decoration": "none",
+
+        "built-in-types-style": "normal",
+        "built-in-types-font-weight": "normal",
+        "built-in-types-color": "rgb(177 148 93)",
+        "built-in-types-decoration": "none",
+
+        "string-style": "normal",
+        "string-font-weight": "normal",
+        "string-color": "rgb(87 162 87)",
+        "string-decoration": "none",
+
+        "character-style": "normal",
+        "character-font-weight": "normal",
+        "character-color": "rgb(135 221 140)",
+        "character-decoration": "none",
+
+        "number-style": "italic",
+        "number-font-weight": "normal",
+        "number-color": "rgb(151 104 22)",
+        "number-decoration": "none",
+
+        "operator-style": "normal",
+        "operator-font-weight": "400",
+        "operator-color": "rgb(80 85 95)",
+        "operator-decoration": "none",
+
+        "function-style": "italic",
+        "function-font-weight": "normal",
+        "function-color": "rgb(71 124 239)",
+        "function-decoration": "none",
+
+        "variable-style": "normal",
+        "variable-font-weight": "bold",
+        "variable-color": "rgb(180 100 40)",
+        "variable-decoration": "none",
+
+        "constant-style": "italic",
+        "constant-font-weight": "bold",
+        "constant-color": "rgb(200 120 60)",
+        "constant-decoration": "none",
+
+        "identifier-style": "normal",
+        "identifier-font-weight": "normal",
+        "identifier-color": "rgb(226 90 81)",
+        "identifier-decoration": "none",
+
+        "comment-style": "italic",
+        "comment-font-weight": "normal",
+        "comment-color": "rgb(160 161 167)",
+        "comment-decoration": "none"
+    }
+}

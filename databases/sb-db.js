@@ -1,11 +1,13 @@
 // xml http request polyfill
-import "https://deno.land/x/xhr@0.1.1/mod.ts";
+import "https://deno.land/x/xhr@0.1.2/mod.ts";
 // supabase import
-// import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 // esm might be better?
-import { createClient } from "https://esm.sh/@supabase/supabase-js?target=deno";
+// hmm it seems to not work anymore.... 🤔
+// import { createClient } from "https://esm.sh/@supabase/supabase-js?target=deno";
 
 import init, { random_name } from "../corul-wasm/pkg/corul_wasm.js";
+
 await init();
 
 const status = {
@@ -33,13 +35,13 @@ export async function add(name, value = '') {
     let match;
     if (!name) {
         // generate a random name of 3 words!
-        name = random_name(3);
+        name = random_name(3).substring(0, 50);
         match = 'similar';
     }
     else {
         match = 'exact';
         let exact = false;
-        for (let i = 0; i < get.data.length; i++)
+        for (let i = 0; i < get?.data?.length; i++)
             if (get.data[i].value === value && get.data[i].name === name) {
                 get.data = [get.data[i]];
                 exact = true;
@@ -47,7 +49,7 @@ export async function add(name, value = '') {
         if (!exact)
             match = 'similar';
     }
-    if (get.data.length > 0 && !get.error) {
+    if (get?.data?.length > 0 && !get?.error) {
         let data = get.data[0];
         let error = null;
         // this should never error, but whatever

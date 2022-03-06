@@ -47,8 +47,8 @@ app.use(async (ctx: Context, next) => {
 });
 
 const playground = async (ctx: RouterContext) => {
-    // TODO: Change this route back to the main playground
     const playground = await Deno.readFile("./routes/playground.html");
+    ctx.response.status = 200;
     ctx.response.headers =
         new Headers({
             'Content-Type': 'text/html'
@@ -60,6 +60,21 @@ const max_title_len = 50;
 const max_value_len = 200000;
 const router =
     new Router()
+        .get('/themes/:name', async ctx => {
+            try {
+                ctx.response.status = 200;
+                ctx.response.headers =
+                    new Headers({
+                        'Content-Type': 'application/json'
+                    });
+                const text = await Deno.readFile(`./themes/${ctx.params.name}`);
+                ctx.response.body =
+                    new TextDecoder('utf-8')
+                        .decode(text);
+            } catch {
+                ctx.response.status = 404;
+            }
+        })
         .get('/play', playground)
         .get('/playground', playground)
         .post('/api/add', async (ctx: RouterContext) => {

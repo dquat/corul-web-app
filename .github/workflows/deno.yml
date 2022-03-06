@@ -7,13 +7,20 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       id-token: write # Needed for auth with Deno Deploy
-      contents: read # Needed to clone the repository
+      contents: read  # Needed to clone the repository
 
     steps:
       - name: Clone repository
         uses: actions/checkout@v2
 
-      # TODO(dquat): add a build step here
+      - name: Use latest deno version
+      - uses: denoland/setup-deno@v1
+        with:
+          deno-version: v1.x
+
+      - name: Run deno build script
+        run: deno run --allow-read --allow-write build.ts
+
       - name: Install wasm-pack
         run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
         
@@ -27,4 +34,4 @@ jobs:
         uses: denoland/deployctl@v1
         with:
           project: "corul-web-app"
-          entrypoint: "./server.ts" # TODO(dquat): update
+          entrypoint: "./server.ts"

@@ -7,15 +7,35 @@
     <meta name="description" content="The playground for the Corul programming language (both are WIP)." />
     <meta name="color-scheme" content="dark light" />
     <title>The Corul Playground</title>
-    <link rel="stylesheet" href="http://fonts.cdnfonts.com/css/cascadia-code">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&family=JetBrains+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800&family=Roboto+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=Source+Code+Pro:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap">
     <link rel="stylesheet" href="global.css" />
     <link rel="stylesheet" href="playground.css" />
+    <script type="module">
+        import { load_theme, load_default_theme } from './load_theme.js';
+        import * as idb from './indexedDB.js';
+        (async () => {
+            let theme = await idb.getItem('theme');
+            if (theme) {
+                try {
+                    let is_custom = idb.toBool(await idb.getItem('custom-theme'));
+                    if (is_custom) {
+                        let contents = idb.toJSON(await idb.getItem(theme));
+                        await load_theme(contents);
+                    } else
+                        await load_theme(theme);
+                } catch (e) {
+                    console.log('Failed to load custom theme! Error:', e);
+                    await load_default_theme();
+                }
+            }
+            else
+                await load_default_theme();
+        })();
+    </script>
 </head>
 <body>
 <div class="horizontal main grid">
     <div class="tool-bar flex">
-        <div class="tb-name">The Corul Playground v0.0.3</div>
+        <div class="tb-name">The Corul Playground v0.0.4</div>
         <div class="btn run" title="Run the code [unimplemented]">
             <svg xmlns="http://www.w3.org/2000/svg" height="100%" viewBox="0 0 16 16">
                 <path d="m11.596 8.697-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z"/>
@@ -43,21 +63,21 @@
             </svg>
         </div>
     </div>
-    <div class="editor" contenteditable="true" spellcheck="false">Editor</div>
+    <div class="editor" spellcheck="false"></div>
     <div class="bar"></div>
     <div class="opener">
         <div class="terminal tab" tab-name="Terminal" >Terminal
 Unimplemented because language is not even in a workable condition!</div>
         <div class="notifications tab" tab-name="Notifications" >
-            <h2 class="tab-heading">Notifications</h2>
+            <h2 class="heading">Notifications</h2>
             <div class="separator-bar"></div>
             <div class="btn clear-all">Clear All</div>
             <p class="no-notif-plchldr">No notifications!</p>
         </div>
         <div class="readme tab" tab-name="Readme" visible="true">
-            <h2 class="tab-heading">Readme!</h2>
+            <h2 class="heading">Readme!</h2>
             <div class="separator-bar"></div>
-            <div class="readme-text" style="white-space: pre">
+            <div class="readme-text" style="white-space: pre; overflow: auto;">
                 <script>
                     const rdme = document.querySelector('.readme-text');
                     fetch('/readme.html', {
@@ -67,14 +87,15 @@ Unimplemented because language is not even in a workable condition!</div>
                         .then(t =>
                             t.text()
                                 .then(t => rdme.innerHTML = t))
-                        .catch(e =>
+                        .catch(e => {
+                            console.log("Error loading readme:", e);
                             rdme.textContent = "Failed to load Readme! :( [Check your connection]"
-                        );
+                        });
                 </script>
             </div>
         </div>
         <div class="project-settings tab" tab-name="Project Settings">
-            <h2 class="tab-heading">Current playground details</h2>
+            <h2 class="heading">Current playground details</h2>
             <div class="separator-bar"></div>
             <div class="playground-details">
                 <label for="playground-name">Playground name:</label>
@@ -85,14 +106,30 @@ Unimplemented because language is not even in a workable condition!</div>
                 <input id="db" type="radio" name="storage-type" checked />
                 <label for="db">Database</label>
                 <br />
-                <input id="url" type="radio" name="storage-type" disabled />
-                <label for="url">Encoded URL (unimplemented)</label>
+                <input id="url" type="radio" name="storage-type" />
+                <label for="url" title="Content greater than 2000 characters should not be stored in this format">Encoded URL</label>
             </div>
         </div>
     </div>
     <div class="footer-bar"></div>
 </div>
-<script src="playground-ui.js"></script>
-<script src="playground.js" type="module"></script>
+<div class="theme-modal flex" style="display: none;">
+    <div class="theme-selector flex">
+        <h2 class="heading">Themes</h2>
+        <input type="text" class="theme-search" placeholder="search for a theme" />
+        <div class="themes"><!-- Dynamically load available themes here --></div>
+        <div class="btns flex">
+            <div class="btn cancel">Cancel</div>
+            <div class="btn ok">Ok</div>
+            <div class="btn upload" title="Upload your custom theme here!">Upload</div>
+            <div class="btn download" title="Download the selected theme template, make it your own and upload!">Download</div>
+        </div>
+    </div>
+</div>
+<!-- Load all the fonts at the last -->
+<link rel="stylesheet" href="https://fonts.cdnfonts.com/css/cascadia-code">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&family=JetBrains+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800&family=Roboto+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=Source+Code+Pro:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap">
+<script src="playground-ui.js" defer></script>
+<script src="playground.js" type="module" defer></script>
 </body>
 </html>

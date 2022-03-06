@@ -31,9 +31,8 @@ mod tests {
     use lexer::esc;
     #[test]
     fn x() {
-        println!("{}", random_name(3));
-        // let mut lexer = Lexer::new(r#"<"#);
-        // let mut ci = "ಹ".char_indices();
-        // println!("{:?}", lexer.string());
+        // println!("{}", random_name(3));
+        let mut lexer = Lexer::new(r#"let x = 10;x += 10 * x;"#);
+        println!("{:?}", lexer.string());
     }
 }

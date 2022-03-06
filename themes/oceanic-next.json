@@ -1,0 +1,105 @@
+{
+    "name": "Oceanic Next",
+    "author": "built-in",
+    "type": "dark",
+    "theme": {
+        "main-color": "rgb(27 43 52)",
+        "code-color": "rgb(196 202 213)",
+        "caret-color": "rgb(186 192 203)",
+
+        "button-color": "rgb(27 43 52)",
+        "button-hover-color": "rgb(47 63 72)",
+        "button-press-color": "rgb(67 83 92)",
+        "button-disabled-color": "rgb(80 100 110)",
+        "settings-cog-button-color": "rgb(216 222 233)",
+        "run-button-color": "rgb(184 187 90)",
+        "save-button-color": "rgb(216 222 233)",
+        "theme-button-color": "rgb(216 222 233)",
+        "layout-button-color": "rgb(216 222 233)",
+
+        "shadow-color": "rgba(30 30 30 / 0.5)",
+        "editor-and-terminal-background": "rgb(27 43 52)",
+        "default-font-color": "rgb(186 192 203)",
+        "selection-background-color": "rgba(110 120 140 / 0.3)",
+        "border-color": "rgb(156 162 173)",
+        "input-focused-border-color": "rgb(68 104 141)",
+
+        "modal-color": "rgba(40 40 40 / 0.7)",
+        "modal-text-color": "rgb(196 202 213)",
+        "modal-filter": "blur(7px)",
+        "modal-tag-color": "rgb(30 30 30)",
+        "modal-selected-color": "rgba(0 0 0 / 0.2)",
+
+        "modal-ok-button-color": "rgb(40 60 110)",
+        "modal-ok-button-hover-color": "rgb(60 80 130)",
+        "modal-ok-button-press-color": "rgb(80 100 150)",
+
+        "modal-cancel-button-color": "rgb(110 40 40)",
+        "modal-cancel-button-hover-color": "rgb(130 40 40)",
+        "modal-cancel-button-press-color": "rgb(150 60 60)",
+
+        "notification-highlight-color": "rgb(180 114 21)",
+        "notification-color": "rgb(30 30 30)",
+        "notification-timestamp-color": "rgb(45 45 45)",
+        "notification-timestamp-text-color": "rgb(200 200 200)",
+        "notification-type-info-color": "rgb(61 107 180)",
+        "notification-type-success-color": "rgb(92 180 61)",
+        "notification-type-warn-color": "rgb(180 180 61)",
+        "notification-type-error-color": "rgb(200 61 61)",
+
+        "keywords-style": "normal",
+        "keywords-font-weight": "normal",
+        "keywords-color": "rgb(197 148 197)",
+        "keywords-decoration": "none",
+
+        "built-in-types-style": "normal",
+        "built-in-types-font-weight": "normal",
+        "built-in-types-color": "rgb(190 180 120)",
+        "built-in-types-decoration": "none",
+
+        "string-style": "normal",
+        "string-font-weight": "normal",
+        "string-color": "rgb(141 185 127)",
+        "string-decoration": "none",
+
+        "character-style": "normal",
+        "character-font-weight": "normal",
+        "character-color": "rgb(158 206 106)",
+        "character-decoration": "none",
+
+        "number-style": "italic",
+        "number-font-weight": "normal",
+        "number-color": "rgb(247 141 83)",
+        "number-decoration": "none",
+
+        "operator-style": "normal",
+        "operator-font-weight": "400",
+        "operator-color": "rgb(87 170 173)",
+        "operator-decoration": "none",
+
+        "function-style": "italic",
+        "function-font-weight": "normal",
+        "function-color": "rgb(99 150 201)",
+        "function-decoration": "none",
+
+        "variable-style": "normal",
+        "variable-font-weight": "bold",
+        "variable-color": "rgb(185 186 190)",
+        "variable-decoration": "none",
+
+        "constant-style": "italic",
+        "constant-font-weight": "bold",
+        "constant-color": "rgb(217 216 219)",
+        "constant-decoration": "none",
+
+        "identifier-style": "normal",
+        "identifier-font-weight": "normal",
+        "identifier-color": "rgb(197 196 199)",
+        "identifier-decoration": "none",
+
+        "comment-style": "italic",
+        "comment-font-weight": "normal",
+        "comment-color": "rgb(100 114 124)",
+        "comment-decoration": "none"
+    }
+}
