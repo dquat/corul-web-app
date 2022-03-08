@@ -14,6 +14,7 @@ async function init() {
 
             req.onerror = e => {
                 console.error('Failed to connect to IndexedDB. Error code:', e.target.errorCode ?? req.result);
+                console.log('Using localstorage for storing data.')
                 inited = true; // we're gonna use localstorage
                 db = null;
                 resolve(e.target.errorCode);
@@ -105,13 +106,13 @@ export async function clear() {
 }
 
 export function toJSON(idb_item) {
-    if (typeof idb_item !== 'object')
+    if (idb_item && typeof idb_item !== 'object')
         return JSON.parse(idb_item);
     return idb_item;
 }
 
 export function toBool(idb_item) {
-    if (typeof idb_item !== "boolean")
+    if (idb_item && typeof idb_item !== "boolean")
         return JSON.parse(idb_item);
     return idb_item;
 }

@@ -157,10 +157,7 @@ import {
     }
 
     try {
-        let list = await idb.getItem('theme-key-list');
-        console.log(list);
-        list = idb.toJSON(list);
-        console.log(list[0]);
+        let list = idb.toJSON(await idb.getItem('theme-key-list'));
         if (list)
             for(const item of list) {
                 const json = idb.toJSON(await idb.getItem(item));
