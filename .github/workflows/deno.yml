@@ -21,9 +21,6 @@ jobs:
       - name: Run deno build script
         run: deno run --allow-read --allow-write build.ts
 
-      - name: Bundle deno server code
-        run: deno bundle ./server.ts -- ./server.bundle.js
-
       - name: Install wasm-pack
         run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
         
@@ -32,6 +29,9 @@ jobs:
         
       - name: Go back to base dir
         run: cd ..
+
+      - name: Bundle deno server code
+        run: deno bundle ./server.ts -- ./server.bundle.js
 
       - name: Upload to Deno Deploy
         uses: denoland/deployctl@v1
