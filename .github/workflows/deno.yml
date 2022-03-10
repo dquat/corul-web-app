@@ -30,11 +30,8 @@ jobs:
       - name: Go back to base dir
         run: cd ..
 
-      - name: Bundle deno server code
-        run: deno bundle ./server.ts -- ./server.bundle.ts
-
       - name: Upload to Deno Deploy
         uses: denoland/deployctl@v1
         with:
           project: "corul-web-app"
-          entrypoint: "./server.bundle.ts"
+          entrypoint: "./server.ts"
