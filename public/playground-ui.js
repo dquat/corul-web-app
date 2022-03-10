@@ -1,12 +1,14 @@
+import * as idb from './indexedDB.js';
+
 const tb          = document.querySelector('.tool-bar'),
       main        = document.querySelector('.main'),
       footer      = document.querySelector('.footer-bar'),
       opener      = document.querySelector('.opener'),
       resize_bar  = document.querySelector('.bar'),
       tabs        = opener ?.querySelectorAll('.tab'),
-      tb_btns     = tb     ?.querySelectorAll('.btn'),
       layout      = tb     ?.querySelector('.layout');
 const footer_children = [];
+
 // generate relevant tab buttons and append them to the footer / sidebar
 if (tabs && tabs.length > 0) {
     let open = false;
@@ -37,37 +39,12 @@ if (tabs && tabs.length > 0) {
 }
 
 
-class UI {
+export class UI {
 
     static MIN_WIDTH  = 400;
     static MIN_HEIGHT = 400;
 
     constructor() {}
-
-    reset_tab(/* off = true */) {
-        const [w, h] = [
-            opener.style.width,
-            opener.style.height,
-        ];
-        // if (off) {
-            main.classList.remove('auto-tab');
-            // if (w) this.prev_width  = parseFloat(w);
-            // if (h) this.prev_height = parseFloat(h);
-            opener.style.width  = null;
-            opener.style.height = null;
-            // this part will be used later when we make resizing tabs more powerful
-        // } else if (this.prev_width || this.prev_height) {
-        //     main.classList.add('auto-tab');
-        //     if (main.classList.contains('horizontal')) {
-        //         opener.style.width = this.prev_width + 'px';
-        //         opener.style.height = null;
-        //     }
-        //     if (main.classList.contains('vertical')) {
-        //         opener.style.height = this.prev_height + 'px';
-        //         opener.style.width = null;
-        //     }
-        // }
-    }
 
     move_to_tab({ id, el }) {
         const sel_tab =
@@ -83,9 +60,7 @@ class UI {
                     footer_btn.classList.remove('selected');
             sel_tab.classList.remove('hide');
             tab    .classList.add('selected');
-            // this.reset_tab(false);
         } else {
-            this.reset_tab();
             for (const footer_btn of footer_children)
                 footer_btn.classList.remove('selected');
             main.classList.add('hide');
@@ -111,7 +86,6 @@ class UI {
         }
         if (window.innerHeight <= UI.MIN_HEIGHT || window.innerWidth <= UI.MIN_WIDTH) {
             this.window_small = true;
-            this.reset_tab();
             if (window.innerWidth <= UI.MIN_WIDTH) {
                 main.classList.remove('horizontal');
                 main.classList.add('vertical');
@@ -129,9 +103,8 @@ class UI {
         } else reset(this);
     }
 
-    change_layout() {
+    async change_layout() {
         if (this.window_small) return;
-        this.reset_tab();
         layout.classList.toggle('flip');
         if (layout.classList.contains('flip')) {
             this.mode = 'vertical';
@@ -142,7 +115,7 @@ class UI {
             main.classList.remove('vertical');
             main.classList.add(this.mode);
         }
-        localStorage.setItem('layout', this.mode);
+        await idb.setItem('layout', this.mode);
     }
 
     resize_tab(e, type) {
@@ -174,13 +147,14 @@ class UI {
                     const [ ox, oy ] = [ pcx - cx, pcy - cy ];
                     const opener_cs = window.getComputedStyle(opener);
                     if (main.classList.contains('horizontal')) {
-                        opener.style.width =
-                            parseFloat(opener_cs.width) + ox + 'px';
+                        document.documentElement
+                            .style
+                            .setProperty('--tab-width', parseFloat(opener_cs.width) + ox + 'px');
                     } else if (main.classList.contains('vertical')) {
-                        opener.style.height =
-                            parseFloat(opener_cs.height) + oy + 'px';
+                        document.documentElement
+                            .style
+                            .setProperty('--tab-height', parseFloat(opener_cs.height) + oy + 'px');
                     }
-                    main.classList.add('auto-tab');
                     this.coords = { cx, cy };
                 }
             }
@@ -192,70 +166,71 @@ class UI {
         }
     }
 
-    start() {
+    async start() {
         // First class must always be `horizontal` or `vertical` to work
-        this.mode = localStorage.getItem('layout') ?? main.classList[0];
+        this.mode = await idb.getItem('layout') ?? main.classList[0];
         for (const child of footer_children)
             child.addEventListener('click', this.footer_btn_click.bind(this, child));
         if (layout) // will always be true, for this website, but anyway...
             layout.addEventListener('click', this.change_layout.bind(this));
+
         this.size_check();
         window.addEventListener('resize', this.size_check.bind(this));
-        const t = this;
-        resize_bar.addEventListener('dragstart'  , e => e.preventDefault());
 
-        resize_bar.addEventListener('mousedown'  , e => t.resize_tab.call(t, e, 'down'));
-        resize_bar.addEventListener('touchstart' , e => t.resize_tab.call(t, e, 'down'),
+        const t = this;
+        resize_bar.addEventListener('dragstart' , e => e.preventDefault());
+
+        resize_bar.addEventListener('mousedown' , e => t.resize_tab.call(t, e, 'down'));
+        resize_bar.addEventListener('touchstart', e => t.resize_tab.call(t, e, 'down'),
             { passive: true }); // apparently passive improves performance? (lighthouse)
         // it does seem to remove that "laggy bug" that occurs when using touch to resize the tab
 
-        window.addEventListener('mousemove'      , e => t.resize_tab.call(t, e, 'move'));
-        window.addEventListener('touchmove'      , e => t.resize_tab.call(t, e, 'move'),
+        window.addEventListener('mousemove'  , e => t.resize_tab.call(t, e, 'move'));
+        window.addEventListener('touchmove'  , e => t.resize_tab.call(t, e, 'move'),
             { passive: true });
 
-        window.addEventListener('mouseup'        , e => t.resize_tab.call(t, e, 'end'));
-        window.addEventListener('touchend'       , e => t.resize_tab.call(t, e, 'end'),
+        window.addEventListener('mouseup'    , e => t.resize_tab.call(t, e, 'end'));
+        window.addEventListener('touchend'   , e => t.resize_tab.call(t, e, 'end'),
             { passive: true });
-        window.addEventListener('touchcancel'    , e => t.resize_tab.call(t, e, 'end'),
+        window.addEventListener('touchcancel', e => t.resize_tab.call(t, e, 'end'),
             { passive: true });
-        window.addEventListener('mouseleave'     , e => t.resize_tab.call(t, e, 'end'));
-        window.addEventListener('dragend'        , e => t.resize_tab.call(t, e, 'end'));
+        window.addEventListener('mouseleave' , e => t.resize_tab.call(t, e, 'end'));
+        window.addEventListener('dragend'    , e => t.resize_tab.call(t, e, 'end'));
 
-        const db  = document.querySelector('#db'),
-              url = document.querySelector("#url");
+        const db = document.querySelector('#db'),
+             url = document.querySelector("#url");
 
-        db.addEventListener('input', _ =>
-            localStorage.setItem('db-mode', db.checked.toString())
+        db.addEventListener('input', async _ =>
+            await idb.setItem('db-mode', db.checked.toString())
         );
-        url.addEventListener('input', _ =>
-            localStorage.setItem('db-mode', (!url.checked).toString())
+        url.addEventListener('input', async _ =>
+            await idb.setItem('db-mode', (!url.checked).toString())
         );
 
-        if (localStorage.getItem('db-mode') === 'false') {
-            db.checked  = false;
+        if (await idb.getItem('db-mode') === 'false') {
+            db .checked = false;
             url.checked = true;
         }
+
+        // replace characters in playground-name input area
+        const playground_name_input = document.querySelector('#playground-name');
+        playground_name_input.addEventListener('input', e => {
+            playground_name_input.value =
+                playground_name_input.value.replace(/[^\dA-Z\-_]/gi, '');
+            playground_name_input.value =
+                playground_name_input.value.substring(0, 50 /* Max name length */ );
+        });
     }
 }
-// this variable can be used in other scripts
-const ui = new UI();
-ui.start();
 
-// replace characters in playground-name input area
-const playground_name_input = document.querySelector('#playground-name');
-playground_name_input.addEventListener('input', e => {
-    playground_name_input.value =
-        playground_name_input.value.replace(/[^\dA-Z\-_]/gi, '');
-    playground_name_input.value =
-        playground_name_input.value.substring(0, 50 /* Max name length */ );
-});
-
-class Notification {
+export class Notification {
     constructor(
+        ui           ,
         base_class   ,
         message_class,
         time_class   ,
     ) {
+        this.ui         = ui;
         this._root      =
             opener.querySelector('.notifications') || document.documentElement;
         this._base_cls  = base_class     || 'notification';
@@ -285,6 +260,13 @@ class Notification {
         this._type = type;
     }
 
+    _pad(value) {
+        if (value < 10)
+            value = '0' + value;
+        return value;
+    }
+
+    // generate timestamp
     _gen_ts() {
         const date    = new Date(),
               hrs     = date.getHours(),
@@ -292,7 +274,7 @@ class Notification {
               secs    = date.getSeconds(),
               am_pm   = hrs >= 12 ? ' PM' : ' AM',
               hrs_fmt = `${this._hour24 ? hrs : (hrs > 12 ? hrs - 12 : hrs)}`;
-        return `${ hrs_fmt }:${ mins }:${ secs }${ this._hour24 ? '' : am_pm }`;
+        return `${ hrs_fmt }:${ this._pad(mins) }:${ this._pad(secs) }${ this._hour24 ? '' : am_pm }`;
     }
 
     send(value = "Unknown message") {
@@ -300,15 +282,19 @@ class Notification {
         const q = this._root.querySelector('.no-notif-plchldr');
         if (q) q.remove();
 
-        ui.move_to_tab({ id: this._root.classList[0] });
+        this.ui.move_to_tab({ id: this._root.classList[0] });
 
         const base      = document.createElement("div"),
               text_span = document.createElement("span");
 
+        base.title = 'Double click to remove this notification.';
+
         text_span.append(value);
-        base.append(text_span);
+        base     .append(text_span);
+
         text_span.classList.add(this._msg_cls);
         base     .classList.add(this._base_cls);
+
         if (this._type)
             base.classList.add(this._type);
 
@@ -322,9 +308,10 @@ class Notification {
         this._root.append(base);
         this._type = null;
 
-        this._root.scrollTo(this._root.scrollLeft, this._root.scrollHeight)
+        this._root.scrollTo(this._root.scrollLeft, this._root.scrollHeight);
+
+        base.addEventListener('dblclick', _ => base.remove());
+
         return base;
     }
 }
-
-const notifs = new Notification();
