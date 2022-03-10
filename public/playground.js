@@ -216,11 +216,12 @@ import {
             rng.insertNode(df);
             rng.collapse(false);
             input(e); // cursor sometimes bounces when event is not triggered here
-            // partially fixes no scroll when enter key is pressed.
-            // it stops working after a lot of new lines, idk why.
-            const range = window.getSelection().getRangeAt(0);
-            const br    = range.getBoundingClientRect();
-            editor.scrollTo(br.x, br.y);
+            // tried to fix no-scroll when enter key is pressed :(, it was bad.
+            // // partially fixes no scroll when enter key is pressed.
+            // // it stops working after a lot of new lines, idk why.
+            // const range = window.getSelection().getRangeAt(0);
+            // const br    = range.getBoundingClientRect();
+            // editor.scrollTo(br.x, br.y);
         }
     });
 
