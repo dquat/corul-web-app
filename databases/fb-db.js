@@ -2,7 +2,7 @@
 import "https://deno.land/x/xhr@0.1.2/mod.ts";
 
 // V9.6.8 does not seem to work right now...
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.6.7/firebase-app.js';
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.6.3/firebase-app.js';
 import {
     child,
     equalTo,
@@ -15,7 +15,7 @@ import {
     endAt,
     onValue,
     update
-} from 'https://www.gstatic.com/firebasejs/9.6.7/firebase-database.js';
+} from 'https://www.gstatic.com/firebasejs/9.6.3/firebase-database.js';
 
 import { validate } from 'https://deno.land/std@0.129.0/uuid/mod.ts';
 
