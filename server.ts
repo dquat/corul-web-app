@@ -1,17 +1,16 @@
 // oak server
 import {Application, Context, Router, RouterContext, Status} from "https://deno.land/x/oak@v9.0.1/mod.ts";
-import * as sb from "./databases/sb-db.js"
+import * as sb from "./databases/sb-db.js";
+import * as fb from "./databases/fb-db.js";
+
+// await fb.add(null, 'wxyz');
+// await sb.add(null, 'abc');
 
 const status = {
     ok    : 'ok',
     error : 'error'
 };
 
-// const prod = !!Deno.env.get("PROD");
-const db_url = 'https://corul-playground-db-production.up.railway.app';
-    // prod ?
-    //     'https://corul-playground-db-production.up.railway.app' :
-    //     'http://localhost:8080';
 const app = new Application();
 
 app.addEventListener("listen", ({ hostname , port, secure }) => {
@@ -77,8 +76,9 @@ const router =
         })
         .get('/play', playground)
         .get('/playground', playground)
-        .post('/api/add', async (ctx: RouterContext) => {
-            const body  = await ctx.request.body(),
+        .post('/api/add/:type', async (ctx: RouterContext) => {
+            const type  = ctx.params.type,
+                  body  = await ctx.request.body(),
                   value = await body.value,
                   text  = value?.text?.trim(),
                   name  = value?.name?.trim();
@@ -88,19 +88,20 @@ const router =
                 ctx.response.body = { status: status.error, data: null, error: null }
                 return;
             }
-            const add = await sb.add(name, text);
+            const add = await (type === 'fb' ? fb.add(name, text) : sb.add(name, text));
             ctx.response.status = Status.OK;
             ctx.response.body = add;
         })
-        .post('/api/get', async ctx => {
-            const body  = await ctx.request.body();
-            const value = await body.value;
+        .post('/api/get/:type', async ctx => {
+            const type  = ctx.params.type,
+                  body  = await ctx.request.body(),
+                  value = await body.value;
             if (!value.id) {
                 ctx.response.status = Status.BadRequest;
                 ctx.response.body = { status: status.error, data: null, error: null }
                 return;
             }
-            const get = await sb.get_id(value.id);
+            const get = await (type === 'fb' ? fb.get_id(value.id) : sb.get_id(value.id));
             if (get?.error?.code === "22P02" /* uuid syntax invalid */ )
                 ctx.response.status = Status.BadRequest;
             else if (get.status === status.error)

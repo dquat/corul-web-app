@@ -50,13 +50,13 @@ export function locate_cursor_pos(root, index) {
     };
 }
 
-export async function load(id) {
+export async function load(id, type) {
     if (!id)
         throw null;
 
     let res = null;
     try {
-        res = await fetch("/api/get", {
+        res = await fetch(`/api/get/${ type ?? 'sb' }`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -74,7 +74,7 @@ export async function load(id) {
     const json = await res?.json();
 
     if (json?.status === 'error') {
-        console.log(`Encountered error when trying to get ID ${id}:`, json?.error);
+        console.log(`Encountered error when trying to get ID ${ id }:`, json?.error);
         throw "Check your connection and try again.";
     }
 
@@ -85,12 +85,12 @@ export async function load(id) {
         throw "A server error occurred! Please try again later.";
 }
 
-export async function add(value, name) {
+export async function add(value, name, type) {
     if (!value)
         throw "Expected the editor to contain code, but it is empty! Please add code to store.";
     let res = null;
     try {
-        res = await fetch("/api/add", {
+        res = await fetch(`/api/add/${ type ?? 'sb' }`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

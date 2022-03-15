@@ -46,7 +46,6 @@ import {
           thm_regex                   = /[\[\]()*!#$%^+={}|\\"'<>,/:;?@& ]/g;
 
     let waiting_for_link = false,
-        previous_theme   = current_theme,
         custom_theme_key = null;
 
     const ui     = new UI(),
@@ -70,8 +69,9 @@ import {
     }
     else
         await load_default_theme();
+    let previous_theme = current_theme;
 
-    // remove loader screen here, or make it appear like it get removed.
+    // remove loader screen here, i.e. slide it up then remove it.
     const load_screen = document.querySelector('.load-screen');
     load_screen.classList.add('remove');
 
@@ -108,10 +108,12 @@ import {
             }
             await load_default();
         }
-    } else {
+    } else if (id) {
         try {
+            const type = params.get('t');
+            if (!type) throw "Expected a database type in URL. Please ensure you entered the URL in correctly.";
             const then = Date.now();
-            const res = await load(id);
+            const res = await load(id, type);
             // should be true always if no errors occur during load, but still
             if (res?.value)
                 editor.innerHTML = colorize(res.value);
@@ -126,7 +128,7 @@ import {
             }
             await load_default();
         }
-    }
+    } else await load_default();
     editor.contentEditable = true;
 
     // check for errors when loading of a theme occurred and notify the user about it
@@ -241,8 +243,7 @@ import {
                 }
             });
         }
-        const in_url = document.querySelector('#url');
-        if (in_url.checked) {
+        if (document.querySelector('#url')?.checked) {
             if (editor.textContent.length > max_recommended_encoded_len) {
                 notifs.set_type('n-warn');
                 notifs.send(
@@ -250,14 +251,14 @@ import {
                 );
             }
             let gen_url = encode_unicode(editor.textContent);
-            let link = `${window.location.pathname}?b=${gen_url}`;
+            let link = `${ window.location.pathname }?b=${ gen_url }`;
             window.history.replaceState(null, null, link);
             let abs_link =
-                `${window.location.protocol}//${window.location.hostname}${window.location.port ? ':' + window.location.port : ''}` + link;
+                `${ window.location.protocol }//${ window.location.hostname }${ window.location.port ? ':' + window.location.port : '' }` + link;
             notifs.set_type('n-info');
             let el;
             if (abs_link.length < 100)
-                el = notifs.send(`The link for this snippet is: ${abs_link}. Click to copy`);
+                el = notifs.send(`The link for this snippet is: ${ abs_link }. Click to copy`);
             else
                 el = notifs.send(`The link for this snippet is too long to display. Click to copy the link`);
             copy_link(el, abs_link);
@@ -268,10 +269,16 @@ import {
             notifs.send('Whoa there! Wait up! Your link is getting prepared...');
             return;
         }
+
+        // only require FB because we know URL isnt checked.
+        const type =
+            document.querySelector('#fb-db')?.checked
+                ? 'fb' : 'sb';
+
         waiting_for_link = true;
         let res = null;
         try {
-            res = await add(editor.textContent, play_name.value, null);
+            res = await add(editor.textContent, play_name.value, type);
             if (res?.name)
                 play_name.value = res.name;
             waiting_for_link = false;
@@ -281,10 +288,10 @@ import {
             notifs.send(`Failed to add to database! ${e}`);
             return;
         }
-        let link = `${window.location.pathname}?i=${res.id}`;
+        let link = `${ window.location.pathname }?i=${ res.id }&t=${ type }`;
         window.history.replaceState(null, null, link);
         let abs_link =
-            `${window.location.protocol}//${window.location.hostname}${window.location.port ? ':' + window.location.port : ''}` + link;
+            `${ window.location.protocol }//${ window.location.hostname }${ window.location.port ? ':' + window.location.port : '' }` + link;
 
         notifs.set_type('n-info');
         const span = document.createElement('span');
@@ -295,7 +302,7 @@ import {
             similar =
                 'A similar entry (with a different name and same value) already exists in the database, for which the link is: ';
         span.innerHTML =
-            `${similar}<span class='artificial-link'>${abs_link}</span>. All entries expire after 30 days. Click to copy`;
+            `${ similar }<span class='artificial-link'>${ abs_link }</span>. All entries expire after 30 days. Click to copy`;
         copy_link(notifs.send(span), abs_link);
     });
 

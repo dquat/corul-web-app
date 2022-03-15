@@ -197,26 +197,36 @@ export class UI {
         window.addEventListener('mouseleave' , e => t.resize_tab.call(t, e, 'end'));
         window.addEventListener('dragend'    , e => t.resize_tab.call(t, e, 'end'));
 
-        const db = document.querySelector('#db'),
-             url = document.querySelector("#url");
+        const sb_db = document.querySelector('#sb-db'),
+              fb_db = document.querySelector('#fb-db'),
+              url   = document.querySelector("#url");
 
-        db.addEventListener('input', async _ =>
-            await idb.setItem('db-mode', db.checked.toString())
-        );
-        url.addEventListener('input', async _ =>
-            await idb.setItem('db-mode', (!url.checked).toString())
-        );
+        sb_db.addEventListener('input', async _ => {
+            if (sb_db.checked)
+                await idb.setItem('db-mode', 'sb-db')
+        });
+        fb_db.addEventListener('input', async _ => {
+            if (fb_db.checked)
+                await idb.setItem('db-mode', 'fb-db')
+        });
+        url.addEventListener('input', async _ => {
+            if (url.checked)
+                await idb.setItem('db-mode', 'url')
+        });
 
-        if (await idb.getItem('db-mode') === 'false') {
-            db .checked = false;
-            url.checked = true;
+        fb_db.checked = false;
+        sb_db.checked = false;
+        url  .checked = false;
+
+        switch (await idb.getItem('db-mode')) {
+            case 'sb-db' : sb_db.checked = true; break;
+            case 'fb-db' : fb_db.checked = true; break;
+            case 'url'   : url  .checked = true; break;
         }
 
         // replace characters in playground-name input area
         const playground_name_input = document.querySelector('#playground-name');
-        playground_name_input.addEventListener('input', e => {
-            playground_name_input.value =
-                playground_name_input.value.replace(/[^\dA-Z\-_]/gi, '');
+        playground_name_input.addEventListener('input', _ => {
             playground_name_input.value =
                 playground_name_input.value.substring(0, 50 /* Max name length */ );
         });

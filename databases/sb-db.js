@@ -96,6 +96,7 @@ export async function get_id(id) {
 }
 
 // get all the elements with matching names
+// unused currently...
 export async function get_nms(name = "") {
     if (!name || name.trim() === "")
         return {

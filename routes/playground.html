@@ -7,8 +7,12 @@
     <meta name="description" content="The playground for the Corul programming language (both are WIP)." />
     <meta name="color-scheme" content="dark light" />
     <title>The Corul Playground</title>
-    <link rel="stylesheet" href="global.css" />
-    <link rel="stylesheet" href="playground.css" />
+    <link rel="preload" href="global.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link rel="preload" href="playground.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript>
+        <link rel="stylesheet" href="global.css">
+        <link rel="stylesheet" href="playground.css">
+    </noscript>
     <style>
         /* Loader styles */
         :root {
@@ -207,11 +211,14 @@ Unimplemented because language is not even in a workable condition!</div>
                 <br />
                 Storage type:
                 <br />
-                <input id="db" type="radio" name="storage-type" checked />
-                <label for="db">Database</label>
+                <input id="sb-db" type="radio" name="storage-type" checked />
+                <label for="sb-db" title="Good for long entries. Fastest database.">Database 1 (Supabase)</label>
+                <br />
+                <input id="fb-db" type="radio" name="storage-type" />
+                <label for="fb-db" title="Good for medium sized entries. Slower than Database 1.">Database 2 (Firebase)</label>
                 <br />
                 <input id="url" type="radio" name="storage-type" />
-                <label for="url" title="Content greater than 2000 characters should not be stored in this format">Encoded URL</label>
+                <label for="url" title="Good for small entries. Use only for entries less than 2000 characters.">Encoded URL</label>
             </div>
         </div>
     </div>
@@ -231,8 +238,14 @@ Unimplemented because language is not even in a workable condition!</div>
     </div>
 </div>
 <!-- Load all the fonts at the last -->
-<link rel="stylesheet" href="https://fonts.cdnfonts.com/css/cascadia-code">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&family=JetBrains+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800&family=Roboto+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=Source+Code+Pro:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap">
-<script src="playground.js" type="module" defer></script>
+<!--<link rel="stylesheet" href="https://fonts.cdnfonts.com/css/cascadia-code">-->
+<!--<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&family=JetBrains+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800&family=Roboto+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=Source+Code+Pro:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap">-->
+<link rel="preload" href="https://fonts.cdnfonts.com/css/cascadia-code" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<link rel="preload" href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&family=JetBrains+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800&family=Roboto+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=Source+Code+Pro:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript>
+    <link rel="stylesheet" href="https://fonts.cdnfonts.com/css/cascadia-code">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&family=JetBrains+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800&family=Roboto+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=Source+Code+Pro:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap">
+</noscript>
+<script src="playground.js" type="module" async></script>
 </body>
 </html>
