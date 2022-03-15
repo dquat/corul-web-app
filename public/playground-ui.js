@@ -219,9 +219,9 @@ export class UI {
         url  .checked = false;
 
         switch (await idb.getItem('db-mode')) {
-            case 'sb-db' : sb_db.checked = true; break;
             case 'fb-db' : fb_db.checked = true; break;
             case 'url'   : url  .checked = true; break;
+            default      : sb_db.checked = true;
         }
 
         // replace characters in playground-name input area
