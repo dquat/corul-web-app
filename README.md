@@ -1,5 +1,5 @@
-![Matriad Logo](/public/matriad_name_dark.svg#gh-light-mode-only)
-![Matriad Logo](/public/matriad_name_light.svg#gh-dark-mode-only)
+![Matriad Logo](https://raw.githubusercontent.com/dquat/matriad-web-app/main/public/matriad_name_dark.svg#gh-light-mode-only)
+![Matriad Logo](https://raw.githubusercontent.com/dquat/matriad-web-app/main/public/matriad_name_light.svg#gh-dark-mode-only)
 
 ## Matriad web app
 - The website meant for the Matriad Programming Language
