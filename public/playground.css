@@ -220,8 +220,10 @@ input[type=text]:focus {
 }
 
 .heading {
-    margin     : 1rem 0 0;
-    text-align : center;
+    margin      : 1rem 0 0;
+    text-align  : center;
+    overflow-x  : auto;
+    flex-shrink : 0;
 }
 
 /* Main grid styles */
@@ -329,13 +331,13 @@ input[type=text]:focus {
     overflow  : auto;
 }
 
-.readme.tab {
+.readme.tab, .get-started.tab {
     display        : flex;
     flex-direction : column;
 }
 
-.readme-text {
-    white-space : pre;
+.readme-text, .get-started-text {
+    white-space : pre-wrap;
     overflow    : auto;
     height      : 100%;
     width       : 100%;
@@ -435,12 +437,29 @@ input[type=text]:focus {
 
 /* Notifications */
 
-.notifications .clear-all {
+.notifications .clear-all, .playground-details .clear-all {
     padding       : 0.5rem;
     border-radius : 0.25rem;
-    width         : 100%;
     margin-bottom : 1rem;
 }
+
+.notifications .clear-all {
+    width : 100%;
+}
+
+.playground-details .clear-all {
+    color            : var(--thm-alert-btn-txt-clr);
+    background-color : var(--thm-alert-btn-clr);
+}
+
+.playground-details .clear-all:hover {
+    background-color : var(--thm-alert-btn-hvr-clr);
+}
+
+.playground-details .clear-all:active {
+    background-color : var(--thm-alert-btn-clk-clr);
+}
+
 
 @keyframes highlight {
     0% {

@@ -6,7 +6,7 @@ import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 // hmm it seems to not work anymore.... 🤔
 // import { createClient } from "https://esm.sh/@supabase/supabase-js?target=deno";
 
-import init, { random_name } from "../corul-wasm/pkg/corul_wasm.js";
+import init, { random_name } from "../matriad-wasm/pkg/matriad_wasm.js";
 
 await init();
 
@@ -29,7 +29,7 @@ export async function add(name, value = '') {
     // if it exists, then return the same thing
     let get =
         await supabase
-            .from('corul-playground-db')
+            .from('matriad-playground-db')
             .select('*')
             .eq('value', value);
     let match;
@@ -72,7 +72,7 @@ export async function add(name, value = '') {
     }
     const { data, error } =
         await supabase
-            .from('corul-playground-db')
+            .from('matriad-playground-db')
             .insert([{ name, value }]);
     return {
         status : error || !data || data.length === 0 ? status.error : status.ok,
@@ -85,7 +85,7 @@ export async function add(name, value = '') {
 export async function get_id(id) {
     const { data, error } =
         await supabase
-            .from('corul-playground-db')
+            .from('matriad-playground-db')
             .select('*')
             .eq('id', id)
     return {
@@ -106,7 +106,7 @@ export async function get_nms(name = "") {
         };
     const { data, error } =
         await supabase
-            .from('corul-playground-db')
+            .from('matriad-playground-db')
             .select('*')
             .ilike('name', `%${name.trim()}%`);
     return {

@@ -1,7 +1,7 @@
 /.idea/
-corul-wasm/target
+matriad-wasm/target
 corul-wasm/**/*.rs.bk
-corul-wasm/Cargo.lock
-corul-wasm/bin/
-corul-wasm/pkg/
-corul-wasm/wasm-pack.log
+matriad-wasm/Cargo.lock
+matriad-wasm/bin/
+matriad-wasm/pkg/
+matriad-wasm/wasm-pack.log

@@ -1,0 +1,80 @@
+<style>
+    .heading {
+        display    : inline-block;
+        text-align : center;
+        width      : 100%;
+    }
+</style>
+First off, this is the web editor for an unfinished, programming language which only has a lexer implemented so far.
+<h3 class="heading">1. The UI</h3>
+<h4 class="heading">Section 1.1</h4>
+Here, what you're reading is the contents of a "tab"
+Right next to your tab, to the right or below (depending on your layout [section 1.2]), you will see a bar
+This bar allows you to open, close and select specific tabs.
+There are 5 tabs available in this bar:
+    - Note: If you see less than 5 tabs, chances are your screen is too small to display all the tabs. In this case, an invisible scrollbar will appear, and you can scroll normally, even if you don't see a scrollbar.
+    - Terminal
+        - Unimplemented, but it is a to-be terminal for my language when you're going to be able to run it.
+    - Notifications
+        - This tab shows you any notifications that might be sent from the playground.
+        - It will open automatically when a new notification is sent.
+        - The new notification will be highlighted momentarily to help you identify it.
+        - <b>Double clicking on a notification will remove it!</b>
+        - <b>The Clear All button on the top of the notification tab will remove <u>all</u> of your notifications!</b>
+    - Get Started
+        - This tab you're reading right now, to help you get started with this playground!
+    - Readme
+        - Here you will see the latest release notes, i.e. what I changed in the specific "release"
+        - You will also see the email I want you to send bugs / feature requests to.
+        - Also, you will see the links for the repos of:
+            - This web app you're currently viewing
+            - The programming language I'm making
+    - Project Settings
+        - Here you will find options to change the playground name and playground storage options
+            - Playground Name: Anything between 1-50 characters. If empty, a random name will be assigned for you
+            - Playground Storage:
+                - Database 1: The most tested, best for any size (long and short), and relatively fast database. Selected by default
+                - Database 2: The newest database, and supposedly the fastest. Good for short or medium entries. Long entries untested.
+                - Encoded URL: Stores the data in the URL. Anything above 2000 chars is not recommended, since the page won't load in some browsers, and will throw an error.
+            - Danger Zone:
+                - A clear all button that clears all cache, all custom themes, currently selected theme, and editor data. Think twice before pressing this button.
+<h4 class="heading">Section 1.2</h4>
+Depending on your layout settings and screen size, a layout is chosen:
+    - Vertical
+        - This tab is on the bottom, and the editor on top
+    - Horizontal
+        - This tab is on the right, and the editor on the left-hand side
+<h4 class="heading">Section 1.3</h4>
+Now, for the bar at the top.
+Here, you will see 5 buttons, again:
+    - The one to the far left, Run:
+        - Will run the code. Currently, does nothing, since the language is unimplemented
+    - The one next to it, with the link picture, Save:
+        - Will save your "play" to either:
+            - A database (db #1, or #2 depending on your choice)
+            - Encoded URL
+    - The next button is the layout button:
+        - It is disabled on devices with screen width / height less than 400 pixels in size, and a layout for the best viewing will be picked for you automatically
+        - On larger screens, clicking it will toggle the vertical or horizontal layouts
+            - Vertical: Editor above, Tabs below
+            - Horizontal: Editor to the left, Tabs to the right
+    - The button right before the last one, to the far right is the theme button:
+        - Clicking on this will open a modal with:
+            - A search bar: Allows you to search for themes in the theme selector
+            - A scrolling area with different theme options
+            - A Cancel button: Deselects currently selected theme and uses previously selected theme.
+            - An Ok button: Selects the theme. It will persist across browser sessions.
+            - An Upload button: Uploads a theme you made!
+            - A Download button: Downloads the currently selected theme as a template for you to craft your own themes!
+        - Try it now! Open the theme modal, select a theme, and click Ok!
+    - The last button, the settings button: It's not implemented currently, and will be implemented after I get rid of any pesky bugs and add a few more interesting features!
+<h4 class="heading">Section 1.4</h4>
+Wondering what that pesky little bar between the editor and this tab is?
+Well, it's a resize bar! Try it!
+Click on it and resize the tab!
+The size gets saved when tabs are closed, and opened, but not if you refresh.
+Vertical size and Horizontal size is handled separately, so when you switch layouts, your layout's previous size will still be there!
+<h4 class="heading">Section 1.5</h4>
+Last, but not least, the Editor!
+The editor will auto-save the contents, as you type!
+It has basic syntax highlighting, currently, but more powerful highlighting will come in later releases!

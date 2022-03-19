@@ -25,6 +25,11 @@
         "border-color": "rgb(162 145 130)",
         "input-focused-border-color": "rgba(30 100 200 / 0.5)",
 
+        "alert-button-text-color": "rgb(242 229 188)",
+        "alert-button-color": "rgb(110 40 40)",
+        "alert-button-hover-color": "rgb(130 40 40)",
+        "alert-button-press-color": "rgb(150 60 60)",
+
         "modal-color": "rgba(40 40 40 / 0.7)",
         "modal-text-color": "rgb(235 219 170)",
         "modal-filter": "blur(7px)",

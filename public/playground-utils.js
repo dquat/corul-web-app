@@ -2,13 +2,13 @@ const max_name_len = 50;
 const max_value_len = 200000;
 
 export const default_input =
-    `/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+`/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * This program is free to use & distribute (no copyright)           *
  * It is also perfectly valid Rust code.                             *
  * It's currently used as a placeholder for my programming language  *
  * which is still under development (unusable to any extent).        *
- * Repo for this web app: https://github.com/dquat/corul-web-app     *
- * Repo for language: https://github.com/dquat/Corul                 *
+ * Repo for this web app: https://github.com/dquat/matriad-web-app   *
+ * Repo for language: https://github.com/dquat/Matriad               *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 // Here's a sample Rust program, for you to edit while you're here

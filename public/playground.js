@@ -1,4 +1,4 @@
-import init, { lex } from './corul_wasm.js';
+import init, { lex } from './matriad_wasm.js';
 import * as idb from './indexedDB.js';
 
 import { Notification, UI } from './playground-ui.js';
@@ -37,6 +37,7 @@ import {
           theme_search     = document.querySelector('.theme-selector .theme-search'),
           download_thm     = document.querySelector('.btns .btn.download'),
           upload_thm       = document.querySelector('.btns .btn.upload'),
+          clear_cache      = document.querySelector('.btn.clear-all.cache'),
           main             = document.querySelector('.main');
 
     let   theme_opts       = document.querySelectorAll('.themes .theme-opt');
@@ -349,7 +350,7 @@ import {
                 valued   = false;
             for (const value of values) {
                 valued = true;
-                if (label.includes(value)) {
+                if (label.includes(value.toLowerCase())) {
                     included = true;
                     break;
                 }
@@ -473,9 +474,25 @@ import {
         console.log('Failed to load custom themes! Error', e);
     }
 
+    const close_thm_modal = async _ => {
+        if (thm_load_err) {
+            await close_on_error();
+            return;
+        }
+        set_theme_modal(false);
+        find_theme(previous_theme?.url ?? custom_theme_key);
+        if (
+            previous_theme?.name   === current_theme?.name   &&
+            previous_theme?.author === current_theme?.author &&
+            previous_theme?.type   === current_theme?.type
+        ) return;
+        await load_theme(previous_theme?.value);
+        check_load_err();
+    };
+
     theme_modal.addEventListener('click', e => {
         if (!e.target.closest('.theme-selector'))
-            set_theme_modal(false);
+            close_thm_modal();
     });
 
     const thm_ok     = theme_btns.querySelector('.ok');
@@ -499,22 +516,6 @@ import {
         await find_theme(type);
         custom_theme_key = null;
     }
-
-    const close_thm_modal = async _ => {
-        if (thm_load_err) {
-            await close_on_error();
-            return;
-        }
-        set_theme_modal(false);
-        find_theme(previous_theme?.url ?? custom_theme_key);
-        if (
-            previous_theme?.name   === current_theme?.name   &&
-            previous_theme?.author === current_theme?.author &&
-            previous_theme?.type   === current_theme?.type
-        ) return;
-        await load_theme(previous_theme?.value);
-        check_load_err();
-    };
 
     thm_ok.addEventListener('click', async _ => {
         if (thm_load_err) {
@@ -557,7 +558,7 @@ import {
         a.remove();
     });
 
-    upload_thm.addEventListener('click', async e => {
+    upload_thm.addEventListener('click', async _ => {
         const input         = document.createElement('input');
         input.type          = 'file';
         input.accept        = '*/json';
@@ -615,5 +616,20 @@ import {
                 }
             }
         });
+    });
+    let cache_clear_state = false;
+    clear_cache.addEventListener('click', async _ => {
+        if (!cache_clear_state) {
+            cache_clear_state       = true;
+            clear_cache.textContent = "Are you SURE?";
+            return;
+        }
+        await load_default_theme();
+        previous_theme = current_theme;
+        await idb.clear();
+        clear_cache.textContent = "Clear All Cached Data";
+        cache_clear_state       = false;
+        notifs.set_type('n-success');
+        notifs.send("Cleared cached data successfully!");
     });
 })();

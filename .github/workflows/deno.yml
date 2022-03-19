@@ -25,7 +25,7 @@ jobs:
         run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
         
       - name: Build using wasm-pack
-        run: cd ./corul-wasm && wasm-pack build --release --target web
+        run: cd ./matriad-wasm && wasm-pack build --release --target web
         
       - name: Go back to base dir
         run: cd ..
@@ -33,5 +33,5 @@ jobs:
       - name: Upload to Deno Deploy
         uses: denoland/deployctl@v1
         with:
-          project: "corul-web-app"
+          project: "matriad-web-app"
           entrypoint: "./server.ts"

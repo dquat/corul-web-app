@@ -30,39 +30,48 @@ export function apply_theme(json) {
     style.set("main-color");
     style.set("code-color");
     style.set("caret-color");
-    style.set("button-color", "btn-color");
-    style.set("button-hover-color", "btn-hvr-color");
-    style.set("button-press-color", "btn-clk-color");
-    style.set("button-disabled-color", "btn-dis-color");
     style.set("shadow-color");
-    style.set("editor-and-terminal-background", "ed-term-bg");
-    style.set("default-font-color", "fnt-color");
-    style.set("selection-background-color", "sel-bg-color");
     style.set("border-color");
-    style.set("settings-cog-button-color", "setting-color");
-    style.set("run-button-color", "run-color");
-    style.set("save-button-color", "save-color");
-    style.set("theme-button-color", "theme-color");
-    style.set("layout-button-color", "layout-color");
+
+    style.set("button-color"         , "btn-color");
+    style.set("button-hover-color"   , "btn-hvr-color");
+    style.set("button-press-color"   , "btn-clk-color");
+    style.set("button-disabled-color", "btn-dis-color");
+
+    style.set("editor-and-terminal-background", "ed-term-bg");
+    style.set("default-font-color"            , "fnt-color");
+    style.set("selection-background-color"    , "sel-bg-color");
+
+    style.set("settings-cog-button-color" , "setting-color");
+    style.set("run-button-color"          , "run-color");
+    style.set("save-button-color"         , "save-color");
+    style.set("theme-button-color"        , "theme-color");
+    style.set("layout-button-color"       , "layout-color");
     style.set("input-focused-border-color", "inp-fcs-border");
-    style.set("notification-color", "notif-clr");
-    style.set("notification-highlight-color", "notif-hlt-clr");
-    style.set("notification-timestamp-color", "notif-tms");
+
+    style.set("alert-button-text-color" , "alert-btn-txt-clr");
+    style.set("alert-button-color"      , "alert-btn-clr");
+    style.set("alert-button-hover-color", "alert-btn-hvr-clr");
+    style.set("alert-button-press-color", "alert-btn-clk-clr");
+
+    style.set("notification-color"               , "notif-clr");
+    style.set("notification-highlight-color"     , "notif-hlt-clr");
+    style.set("notification-timestamp-color"     , "notif-tms");
     style.set("notification-timestamp-text-color", "notif-tms-tc");
-    style.set("notification-type-info-color", "notif-info");
-    style.set("notification-type-success-color", "notif-success");
-    style.set("notification-type-warn-color", "notif-warn");
-    style.set("notification-type-error-color", "notif-error");
+    style.set("notification-type-info-color"     , "notif-info");
+    style.set("notification-type-success-color"  , "notif-success");
+    style.set("notification-type-warn-color"     , "notif-warn");
+    style.set("notification-type-error-color"    , "notif-error");
 
     style.set("modal-color");
-    style.set("modal-text-color", "modal-txt-color");
-    style.set("modal-filter", "modal-bd-filter");
-    style.set("modal-selected-color", "modal-sltd-color");
     style.set("modal-tag-color");
-    style.set("modal-ok-button-color", "modal-ok-btn-color");
-    style.set("modal-ok-button-hover-color", "modal-ok-btn-hvr-color");
-    style.set("modal-ok-button-press-color", "modal-ok-btn-clk-color");
-    style.set("modal-cancel-button-color", "modal-cancel-btn-color");
+    style.set("modal-text-color"               , "modal-txt-color");
+    style.set("modal-filter"                   , "modal-bd-filter");
+    style.set("modal-selected-color"           , "modal-sltd-color");
+    style.set("modal-ok-button-color"          , "modal-ok-btn-color");
+    style.set("modal-ok-button-hover-color"    , "modal-ok-btn-hvr-color");
+    style.set("modal-ok-button-press-color"    , "modal-ok-btn-clk-color");
+    style.set("modal-cancel-button-color"      , "modal-cancel-btn-color");
     style.set("modal-cancel-button-hover-color", "modal-cancel-btn-hvr-color");
     style.set("modal-cancel-button-press-color", "modal-cancel-btn-clk-color");
 

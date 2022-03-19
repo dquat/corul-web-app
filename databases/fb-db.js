@@ -1,7 +1,8 @@
 // XMLHttpRequest polyfill
 import "https://deno.land/x/xhr@0.1.2/mod.ts";
 
-// V9.6.8 does not seem to work right now...
+//! V9.6.8 does not seem to work right now...
+// v9.6.3 is wayyyy faster than v9.6.7? lol
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.6.3/firebase-app.js';
 import {
     child,
@@ -19,13 +20,13 @@ import {
 
 import { validate } from 'https://deno.land/std@0.129.0/uuid/mod.ts';
 
-import init, { random_name } from "../corul-wasm/pkg/corul_wasm.js";
+import init, { random_name } from "../matriad-wasm/pkg/matriad_wasm.js";
 
 await init();
 
 // initialize firebase
 const config = JSON.parse(Deno.env.get("FB_CONFIG")),
-      app    = initializeApp(config, "example"),
+      app    = initializeApp(config, "matriad-playground-db"),
       db     = getDatabase(app);
 
 const ret = (error, value, status) =>

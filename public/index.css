@@ -1,0 +1,51 @@
+body {
+    background-color : rgb(50 45 45);
+    color            : rgb(230 230 200);
+}
+
+p {
+    text-align : center;
+}
+
+.flex.title div {
+    width            : 100%;
+    margin           : 0.5rem;
+    padding-inline   : 1rem;
+    text-align       : center;
+    display          : inline-flex;
+    align-items      : center;
+    height           : 100%;
+    border-radius    : 5px;
+    user-select      : none;
+    flex-direction   : column;
+    justify-content  : center;
+    background-color : rgb(85 80 80);
+}
+
+.flex.title {
+    height : 50%;
+}
+
+.flex.title div img {
+    height  : 50%;
+    content : url("./matriad_name_light.svg");
+}
+
+@media (prefers-color-scheme: light) {
+    body {
+        background-color : rgb(230 230 230);
+        color            : rgb(45 45 60);
+    }
+
+    .flex.title div {
+        background-color : rgb(170 170 175);
+    }
+
+    .flex.title div img {
+        content : url("./matriad_name_dark.svg");
+    }
+}
+
+a {
+    color : inherit;
+}

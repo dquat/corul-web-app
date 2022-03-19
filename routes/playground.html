@@ -4,9 +4,9 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="The playground for the Corul programming language (both are WIP)." />
+    <meta name="description" content="The playground for the Matriad programming language (both are WIP)." />
     <meta name="color-scheme" content="dark light" />
-    <title>The Corul Playground</title>
+    <title>The Matriad Playground</title>
 <!--    <link rel="preload" href="global.css" as="style" onload="this.onload=null;this.rel='stylesheet'">-->
 <!--    <link rel="preload" href="playground.css" as="style" onload="this.onload=null;this.rel='stylesheet'">-->
 <!--    <noscript>-->
@@ -143,7 +143,7 @@
 </div>
 <div class="horizontal main grid">
     <div class="tool-bar flex">
-        <div class="tb-name">The Corul Playground v0.0.6</div>
+        <div class="tb-name">The Matriad Playground v0.0.8</div>
         <div class="btn run" title="Run the code [unimplemented]">
             <svg xmlns="http://www.w3.org/2000/svg" height="100%" viewBox="0 0 16 16">
                 <path d="m11.596 8.697-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z"/>
@@ -182,7 +182,27 @@ Unimplemented because language is not even in a workable condition!</div>
             <div class="btn clear-all">Clear All</div>
             <p class="no-notif-plchldr">No notifications!</p>
         </div>
-        <div class="readme tab" tab-name="Readme" visible="true">
+        <div class="get-started tab" tab-name="Get Started" visible="true">
+            <h2 class="heading">Using the editor</h2>
+            <div class="separator-bar"></div>
+            <div class="get-started-text">
+                <script>
+                    const gs = document.querySelector('.get-started-text');
+                    fetch('/get-started.html', {
+                        method: 'GET',
+                        headers: { 'Accept': 'text/html' }
+                    })
+                        .then(t =>
+                            t.text()
+                                .then(t => gs.innerHTML = t))
+                        .catch(e => {
+                            console.log("Error loading readme:", e);
+                            gs.textContent = "Failed to load getting started guide! :( [Check your connection]"
+                        });
+                </script>
+            </div>
+        </div>
+        <div class="readme tab" tab-name="Readme">
             <h2 class="heading">Readme!</h2>
             <div class="separator-bar"></div>
             <div class="readme-text">
@@ -206,19 +226,27 @@ Unimplemented because language is not even in a workable condition!</div>
             <h2 class="heading">Current playground details</h2>
             <div class="separator-bar"></div>
             <div class="playground-details">
-                <label for="playground-name">Playground name:</label>
-                <input id="playground-name" placeholder="Empty = random name" type="text" size="1" />
-                <br />
-                Storage type:
-                <br />
-                <input id="sb-db" type="radio" name="storage-type" checked />
-                <label for="sb-db" title="Good for long entries. Fastest database.">Database 1 (Supabase)</label>
+                <h3><label for="playground-name">Playground Name:</label></h3>
+                <input
+                        id="playground-name"
+                        placeholder="Empty = random name"
+                        type="text"
+                        title="Must be less than 50 characters in length"
+                />
+                <h3>Storage Type:</h3>
+                <input id="sb-db" type="radio" name="storage-type" />
+                <label for="sb-db" title="Good for long entries. Slower than database 2?">Database 1 (Supabase)</label>
                 <br />
                 <input id="fb-db" type="radio" name="storage-type" />
-                <label for="fb-db" title="Good for medium sized entries. Slower than Database 1.">Database 2 (Firebase)</label>
+                <label for="fb-db" title="Good for long / medium entries. Apparently the fastest database.">Database 2 (Firebase)</label>
                 <br />
                 <input id="url" type="radio" name="storage-type" />
                 <label for="url" title="Good for small entries. Use only for entries less than 2000 characters.">Encoded URL</label>
+                <br />
+                <h3>Danger Zone:</h3>
+                <div class="btn clear-all cache">Clear All Cached Data</div>
+                <div><u><b>NOTE:</b></u> This clears <u><b>EVERYTHING</b></u>, including your stored editor content, current theme, and all your uploaded themes!
+                You cannot restore this data once deleted!</div>
             </div>
         </div>
     </div>
@@ -237,13 +265,13 @@ Unimplemented because language is not even in a workable condition!</div>
         </div>
     </div>
 </div>
-<!-- Load all the fonts at the last -->
-<!--<link rel="preload" href="https://fonts.cdnfonts.com/css/cascadia-code" as="style" onload="this.onload=null;this.rel='stylesheet'">-->
-<!--<link rel="preload" href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&family=JetBrains+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800&family=Roboto+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=Source+Code+Pro:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">-->
-<!--<noscript>-->
+<!-- Preload font CSS for loading it last -->
+<link rel="preload" href="https://fonts.cdnfonts.com/css/cascadia-code" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<link rel="preload" href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&family=JetBrains+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800&family=Roboto+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=Source+Code+Pro:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+<noscript>
     <link rel="stylesheet" href="https://fonts.cdnfonts.com/css/cascadia-code">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&family=JetBrains+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800&family=Roboto+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=Source+Code+Pro:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap">
-<!--</noscript>-->
-<script src="playground.js" type="module" async></script>
+</noscript>
+<script src="playground.js" type="module" async="async"></script>
 </body>
 </html>

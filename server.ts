@@ -37,8 +37,8 @@ app.use(async (ctx: Context, next) => {
 app.use(async (ctx: Context, next) => {
     try {
         await ctx.send({
-            root: `${Deno.cwd()}/corul-wasm/pkg`,
-            index: 'corul_wasm.js'
+            root: `${ Deno.cwd() }/matriad-wasm/pkg`,
+            index: 'matriad_wasm.js'
         });
     } catch {
         await next();
