@@ -24,10 +24,12 @@
         "border-color": "rgb(117 118 122)",
         "input-focused-border-color": "rgba(30 100 250 / 0.5)",
 
-        "alert-button-text-color": "rgb(250, 250, 250)",
-        "alert-button-color": "rgb(110 40 40)",
-        "alert-button-hover-color": "rgb(130 40 40)",
-        "alert-button-press-color": "rgb(150 60 60)",
+        "radio-outline-color": "rgb(150 155 160)",
+        "radio-selected-color": "rgb(150 155 160)",
+
+        "alert-button-color": "rgb(250 130 130)",
+        "alert-button-hover-color": "rgb(230 110 110)",
+        "alert-button-press-color": "rgb(210 90 90)",
 
         "modal-color": "rgba(40 40 40 / 0.7)",
         "modal-text-color": "rgb(180 185 195)",

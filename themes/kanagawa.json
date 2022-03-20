@@ -24,7 +24,9 @@
         "border-color": "rgb(84 84 109)",
         "input-focused-border-color": "rgb(68 104 141)",
 
-        "alert-button-text-color": "rgb(196 202 213)",
+        "radio-outline-color": "rgb(135 135 160)",
+        "radio-selected-color": "rgb(140 140 165)",
+
         "alert-button-color": "rgb(110 40 40)",
         "alert-button-hover-color": "rgb(130 40 40)",
         "alert-button-press-color": "rgb(150 60 60)",

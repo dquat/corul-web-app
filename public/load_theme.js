@@ -49,7 +49,9 @@ export function apply_theme(json) {
     style.set("layout-button-color"       , "layout-color");
     style.set("input-focused-border-color", "inp-fcs-border");
 
-    style.set("alert-button-text-color" , "alert-btn-txt-clr");
+    style.set("radio-outline-color", "rdo-out-color");
+    style.set("radio-selected-color", "rdo-sel-color");
+
     style.set("alert-button-color"      , "alert-btn-clr");
     style.set("alert-button-hover-color", "alert-btn-hvr-clr");
     style.set("alert-button-press-color", "alert-btn-clk-clr");
@@ -130,10 +132,16 @@ export function apply_theme(json) {
     style.set("comment-color"      , "com-color");
     style.set("comment-decoration" , "com-dec");
 
-    if (json.type === 'light')
+    if (json.type === 'light') {
         document.documentElement.style.colorScheme = 'light';
-    else
+        document.documentElement.classList.add('light');
+        document.documentElement.classList.remove('dark');
+    }
+    else {
         document.documentElement.style.colorScheme = 'dark';
+        document.documentElement.classList.add('dark');
+        document.documentElement.classList.remove('light');
+    }
 
     console.log(`Theme '${ json.name }' loaded!`);
 }

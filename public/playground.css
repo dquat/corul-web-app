@@ -125,7 +125,34 @@
     background-color : var(--thm-sel-bg-color);
 }
 
+*::-webkit-scrollbar {
+    width            : 7px;
+    height           : 7px;
+    background-color : rgb(66 66 66);
+}
+
+*::-webkit-scrollbar-thumb {
+    background-color : rgb(104 104 104);
+}
+
+*::-webkit-scrollbar-thumb:hover {
+    background-color : rgb(123 123 123);
+}
+
+.light *::-webkit-scrollbar, html.light::-webkit-scrollbar {
+    background-color : rgb(241 241 241);
+}
+
+.light *::-webkit-scrollbar-thumb, html.light::-webkit-scrollbar-thumb {
+    background-color : rgb(193 193 193);
+}
+
+.light *::-webkit-scrollbar-thumb:hover, html.light::-webkit-scrollbar-thumb:hover {
+    background-color : rgb(168 168 168);
+}
+
 *, *::before, *::after {
+    scrollbar-width  : thin; /* Firefox */
     background-color : var(--thm-main-color);
     color            : var(--thm-fnt-color);
     transition       : color var(--transition-rate-default),
@@ -202,6 +229,46 @@ input[type=text] {
 
 input[type=text]:focus {
     box-shadow : var(--thm-inp-fcs-border) 0 0 1px 3px;
+}
+
+/* Style the radio button */
+label.radio, .theme-opt {
+    display     : flex;
+    gap         : 0.5rem;
+    align-items : center;
+}
+
+label.radio {
+    margin-top : 1rem;
+}
+
+input[type=radio] {
+    -webkit-appearance : none;
+    appearance         : none;
+    display            : flex;
+    justify-content    : center;
+    align-items        : center;
+    width              : 16px;
+    height             : 16px;
+    margin             : 0;
+    border             : var(--thm-rdo-out-color) 2px solid;
+    border-radius      : 50%;
+}
+
+input[type=radio]:after {
+    content       : "";
+    width         : 8px;
+    height        : 8px;
+    background    : var(--thm-rdo-sel-color);
+    transform     : scale(0);
+    border-radius : 50%;
+    display       : block;
+    transition    : transform 0.15s;
+    position      : relative;
+}
+
+input[type=radio]:checked:after {
+    transform : scale(1);
 }
 
 #playground-name {
@@ -448,7 +515,6 @@ input[type=text]:focus {
 }
 
 .playground-details .clear-all {
-    color            : var(--thm-alert-btn-txt-clr);
     background-color : var(--thm-alert-btn-clr);
 }
 
@@ -669,6 +735,7 @@ input[type=text]:focus {
     width       : 100%;
     display     : flex;
     align-items : center;
+    flex-shrink : 1000;
     gap         : 0.5rem;
 }
 

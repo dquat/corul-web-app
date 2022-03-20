@@ -234,15 +234,18 @@ Unimplemented because language is not even in a workable condition!</div>
                         title="Must be less than 50 characters in length"
                 />
                 <h3>Storage Type:</h3>
-                <input id="sb-db" type="radio" name="storage-type" />
-                <label for="sb-db" title="Good for long entries. Slower than database 2?">Database 1 (Supabase)</label>
-                <br />
-                <input id="fb-db" type="radio" name="storage-type" />
-                <label for="fb-db" title="Good for long / medium entries. Apparently the fastest database.">Database 2 (Firebase)</label>
-                <br />
-                <input id="url" type="radio" name="storage-type" />
-                <label for="url" title="Good for small entries. Use only for entries less than 2000 characters.">Encoded URL</label>
-                <br />
+                <label for="sb-db" title="Good for long entries. Slower than database 2?" class="radio">
+                    <input id="sb-db" type="radio" name="storage-type" />
+                    Database 1 (Supabase)
+                </label>
+                <label for="fb-db" title="Good for long / medium entries. Apparently the fastest database." class="radio">
+                    <input id="fb-db" type="radio" name="storage-type" />
+                    Database 2 (Firebase)
+                </label>
+                <label for="url" title="Good for small entries. Use only for entries less than 2000 characters." class="radio">
+                    <input id="url" type="radio" name="storage-type" />
+                    Encoded URL
+                </label>
                 <h3>Danger Zone:</h3>
                 <div class="btn clear-all cache">Clear All Cached Data</div>
                 <div><u><b>NOTE:</b></u> This clears <u><b>EVERYTHING</b></u>, including your stored editor content, current theme, and all your uploaded themes!
@@ -265,6 +268,7 @@ Unimplemented because language is not even in a workable condition!</div>
         </div>
     </div>
 </div>
+
 <!-- Preload font CSS for loading it last -->
 <link rel="preload" href="https://fonts.cdnfonts.com/css/cascadia-code" as="style" onload="this.onload=null;this.rel='stylesheet'">
 <link rel="preload" href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&family=JetBrains+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800&family=Roboto+Mono:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&family=Source+Code+Pro:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
