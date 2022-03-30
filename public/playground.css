@@ -12,8 +12,11 @@
 
     /* Basic style variables */
     --fs-code          : 14px;
-    --fw-code          : normal;
     --ff-code          : var(--ff-jb-mono);
+    --lh-code          : var(--lh-default);
+    --ed-term-scroll   : normal;
+    --ligatures-code   : none;
+    --tab-size-code    : 4;
 
     --ed-term-padding  : 0.5rem; /* Editor & terminal padding */
     --tb-ft-bar-size   : 2rem;  /* Title bar and foot / side bar width */
@@ -125,6 +128,7 @@
     background-color : var(--thm-sel-bg-color);
 }
 
+/* Scrollbar styles */
 *::-webkit-scrollbar {
     width            : 7px;
     height           : 7px;
@@ -139,7 +143,11 @@
     background-color : rgb(123 123 123);
 }
 
-.light *::-webkit-scrollbar, html.light::-webkit-scrollbar {
+*::-webkit-scrollbar-corner {
+    background-color : rgb(66 66 66);
+}
+
+.light *::-webkit-scrollbar, html.light::-webkit-scrollbar, .light *::-webkit-scrollbar-corner {
     background-color : rgb(241 241 241);
 }
 
@@ -152,7 +160,7 @@
 }
 
 *, *::before, *::after {
-    scrollbar-width  : thin; /* Firefox */
+    scrollbar-width  : thin; /* Firefox scrollbar style */
     background-color : var(--thm-main-color);
     color            : var(--thm-fnt-color);
     transition       : color var(--transition-rate-default),
@@ -217,28 +225,30 @@
 .settings svg path {
     fill : var(--thm-setting-color);
 }
-
 input[type=text] {
+    width : 100%;
+}
+
+input[type=text], input[type=number] {
     display       : block;
-    width         : 100%;
     outline       : none;
     border        : none;
     border-radius : 1px;
     box-shadow    : var(--thm-border-color) 0 0 1px 1px;
 }
 
-input[type=text]:focus {
+input[type=text]:focus, input[type=number]:focus {
     box-shadow : var(--thm-inp-fcs-border) 0 0 1px 3px;
 }
 
 /* Style the radio button */
-label.radio, .theme-opt {
+label.radio, .theme-opt, label.checkbox, label.number, label.select {
     display     : flex;
     gap         : 0.5rem;
     align-items : center;
 }
 
-label.radio {
+label.radio, label.number, label.checkbox, label.select {
     margin-top : 1rem;
 }
 
@@ -342,7 +352,7 @@ input[type=radio]:checked:after {
 }
 
 /* Side / bottom tabs */
-.tab {
+.opener .tab {
     overflow  : auto;
     word-wrap : anywhere;
     width     : 100%;
@@ -360,11 +370,11 @@ input[type=radio]:checked:after {
     overflow : hidden;
 }
 
-.tab {
+.opener .tab {
     padding : 0.5rem;
 }
 
-.tab.hide {
+.opener .tab.hide {
     overflow   : hidden;
     height     : 0;
     min-height : 0;
@@ -374,16 +384,18 @@ input[type=radio]:checked:after {
 
 /* Editor and terminal */
 .editor, .terminal {
-    padding          : var(--ed-term-padding);
-    background-color : var(--thm-ed-term-bg);
-    color            : var(--thm-code-color);
-    font-family      : var(--ff-code);
-    font-weight      : var(--fw-code);
-    font-size        : var(--fs-code);
-    white-space      : pre;
-    overflow         : auto;
-    tab-size         : 4;
-    caret-color      : var(--thm-caret-color);
+    padding                : var(--ed-term-padding);
+    background-color       : var(--thm-ed-term-bg);
+    color                  : var(--thm-code-color);
+    font-family            : var(--ff-code);
+    font-size              : var(--fs-code);
+    line-height            : var(--lh-code);
+    scroll-behavior        : var(--ed-term-scroll);
+    caret-color            : var(--thm-caret-color);
+    font-variant-ligatures : var(--ligatures-code);
+    tab-size               : var(--tab-size-code);
+    white-space            : pre;
+    overflow               : auto;
 }
 
 /* Enforce code color */
@@ -504,28 +516,31 @@ input[type=radio]:checked:after {
 
 /* Notifications */
 
-.notifications .clear-all, .playground-details .clear-all {
+.notifications .clear-all, .tab-section .clear {
     padding       : 0.5rem;
     border-radius : 0.25rem;
     margin-bottom : 1rem;
+}
+
+.tab-section .clear {
+    margin-top : 1rem;
 }
 
 .notifications .clear-all {
     width : 100%;
 }
 
-.playground-details .clear-all {
+.tab-section .clear {
     background-color : var(--thm-alert-btn-clr);
 }
 
-.playground-details .clear-all:hover {
+.tab-section .clear:hover {
     background-color : var(--thm-alert-btn-hvr-clr);
 }
 
-.playground-details .clear-all:active {
+.tab-section .clear:active {
     background-color : var(--thm-alert-btn-clk-clr);
 }
-
 
 @keyframes highlight {
     0% {
@@ -600,93 +615,93 @@ input[type=radio]:checked:after {
 }
 
 /* Highlighter classes */
-.operator {
+.editor .operator {
     color            : var(--thm-oper-color);
     font-weight      : var(--thm-oper-weight);
     font-style       : var(--thm-oper-style);
     text-decoration  : var(--thm-oper-dec);
 }
 
-.string {
+.editor .string {
     color            : var(--thm-str-color);
     font-weight      : var(--thm-str-weight);
     font-style       : var(--thm-str-style);
     text-decoration  : var(--thm-str-dec);
 }
 
-.char {
+.editor .char {
     color            : var(--thm-chr-color);
     font-weight      : var(--thm-chr-weight);
     font-style       : var(--thm-chr-style);
     text-decoration  : var(--thm-chr-dec);
 }
 
-.number {
+.editor .number {
     color            : var(--thm-num-color);
     font-weight      : var(--thm-num-weight);
     font-style       : var(--thm-num-style);
     text-decoration  : var(--thm-num-dec);
 }
 
-.comment {
+.editor .comment {
     color            : var(--thm-com-color);
     font-weight      : var(--thm-com-weight);
     font-style       : var(--thm-com-style);
     text-decoration  : var(--thm-com-dec);
 }
 
-.keyword {
+.editor .keyword {
     color           : var(--thm-kwds-color);
     font-style      : var(--thm-kwds-style);
     font-weight     : var(--thm-kwds-weight);
     text-decoration : var(--thm-kwds-dec);
 }
 
-.built-in {
+.editor .built-in {
     color           : var(--thm-blt-in-color);
     font-style      : var(--thm-blt-in-style);
     font-weight     : var(--thm-blt-in-weight);
     text-decoration : var(--thm-blt-in-dec);
 }
 
-.identifier {
+.editor .identifier {
     color            : var(--thm-ident-color);
     font-weight      : var(--thm-ident-weight);
     font-style       : var(--thm-ident-style);
     text-decoration  : var(--thm-ident-dec);
 }
 
-.fn {
+.editor .fn {
     color            : var(--thm-fn-color);
     font-weight      : var(--thm-fn-weight);
     font-style       : var(--thm-fn-style);
     text-decoration  : var(--thm-fn-dec);
 }
 
-.variable {
+.editor .variable {
     color            : var(--thm-var-color);
     font-weight      : var(--thm-var-weight);
     font-style       : var(--thm-var-style);
     text-decoration  : var(--thm-var-dec);
 }
 
-.constant {
+.editor .constant {
     color            : var(--thm-const-color);
     font-weight      : var(--thm-const-weight);
     font-style       : var(--thm-const-style);
     text-decoration  : var(--thm-const-dec);
 }
 
-/* Theme selector modal styles */
+/* Modal styles */
 
-.theme-modal {
+.theme-modal, .settings-modal {
     width                   : 100%;
     height                  : 100%;
     background-color        : var(--thm-modal-color);
     position                : fixed;
     top                     : 0;
     left                    : 0;
-    z-index                 : 10;
+    z-index                 : 1000000;
     flex-direction          : column;
 }
 
@@ -694,23 +709,62 @@ input[type=radio]:checked:after {
     filter : var(--thm-modal-bd-filter);
 }
 
-.theme-modal * {
+.theme-modal *, .settings-modal * {
     color : var(--thm-modal-txt-color);
 }
 
-.theme-selector {
+.theme-selector, .settings-area {
     overflow         : auto;
     width            : 100%;
-    max-width        : 600px;
     height           : 100%;
-    max-height       : 400px;
     margin           : auto;
     padding          : 0.5rem;
     background-color : transparent;
-    flex-direction   : column;
 }
 
-.theme-selector *:not(.btns .btn, label .type, label .author) {
+.theme-selector {
+    max-height     : 400px;
+    max-width      : 600px;
+    flex-direction : column;
+}
+
+@media only screen and (max-width: 300px) {
+    .theme-selector {
+        height     : 100%;
+        max-height : 100%;
+    }
+
+    .theme-selector .btns, .settings-area .btns {
+        flex-direction : column;
+    }
+}
+
+.settings-area {
+    --gap               : 0.5rem;
+    grid-template-areas :
+            "heading      heading heading"
+            "tab-selector bar     options"
+            "btns         btns    btns";
+    grid-auto-columns   : 1fr auto 2fr;
+    grid-auto-rows      : auto 1fr auto;
+    max-height          : 600px;
+    max-width           : 900px;
+}
+
+.settings-bar {
+    width            : 2px;
+    background-color : var(--thm-border-color);
+}
+
+@media only screen and (max-width: 450px) {
+    .settings-area {
+        height     : 100%;
+        max-height : 100%;
+    }
+}
+
+.theme-selector *:not(.btns .btn, label .type, label .author),
+.settings-area *:not(.btns .btn, .settings-bar, .btn.selector, .btn.clear) {
     background-color : transparent;
 }
 
@@ -770,7 +824,7 @@ input[type=radio]:checked:after {
     text-align : center;
 }
 
-.theme-selector .btns {
+.btns {
     flex-direction  : row;
     gap             : 0.5rem;
     justify-content : center;
@@ -779,78 +833,80 @@ input[type=radio]:checked:after {
     margin-top      : auto;
 }
 
-.theme-selector .btns .btn {
+.btns .btn {
     width            : 100%;
     padding          : 0.5rem;
     border-radius    : 0.25rem;
 }
 
-.theme-selector .btns .btn:not(.ok, .cancel) {
+.btns .btn:not(.ok, .cancel, .apply) {
     color : var(--thm-fnt-color);
 }
 
 /* Ok button styling */
-.theme-selector .btns .btn.ok {
+.btns .btn.ok {
     background-color : var(--thm-modal-ok-btn-color);
 }
 
-.theme-selector .btns .btn.ok:hover {
+.btns .btn.ok:hover {
     background-color : var(--thm-modal-ok-btn-hvr-color);
 }
 
-.theme-selector .btns .btn.ok:active {
+.btns .btn.ok:active {
     background-color : var(--thm-modal-ok-btn-clk-color);
 }
 
+.btns .btn.apply {
+    background-color : var(--thm-modal-apply-btn-color);
+}
+
+.btns .btn.apply:hover {
+    background-color : var(--thm-modal-apply-btn-hvr-color);
+}
+
+.btns .btn.apply:active {
+    background-color : var(--thm-modal-apply-btn-clk-color);
+}
+
 /* Cancel button styling */
-.theme-selector .btns .btn.cancel {
+.btns .btn.cancel {
     background-color : var(--thm-modal-cancel-btn-color);
 }
 
-.theme-selector .btns .btn.cancel:hover {
+.btns .btn.cancel:hover {
     background-color : var(--thm-modal-cancel-btn-hvr-color);
 }
 
-.theme-selector .btns .btn.cancel:active {
+.btns .btn.cancel:active {
     background-color : var(--thm-modal-cancel-btn-clk-color);
 }
 
-@media only screen and (max-width: 300px) {
-    .theme-selector {
-        height     : 100%;
-        max-height : 100%;
-    }
-
-    .theme-selector .btns {
-        flex-direction : column;
-    }
-}
-
 /* Theme modal animations */
-.theme-modal.hidden {
+.theme-modal.hidden, .settings-modal.hidden {
     opacity   : 0;
     transform : translateY(-150vh);
-    animation : hide-thm-modal ease .25s;
+    animation : hide-modal ease .25s;
 }
 
-.theme-modal:not(.hidden) {
+.theme-modal:not(.hidden), .settings-modal:not(.hidden) {
     opacity   : 1;
     transform : translateY(0vh);
-    animation : unhide-thm-modal ease .25s /* reverse */; /* Adding reverse doesn't seem to work properly? */
+    animation : unhide-modal ease .25s /* reverse */; /* Adding reverse doesn't seem to work properly? */
 }
 
-@keyframes hide-thm-modal {
+@keyframes hide-modal {
     0% {
         opacity   : 1;
         transform : translateY(-0vh);
     }
+
     100% {
         opacity   : 0;
         transform : translateY(-150vh);
     }
 }
 
-@keyframes unhide-thm-modal {
+@keyframes unhide-modal {
     0% {
         opacity   : 0;
         transform : translateY(-150vh);
@@ -859,4 +915,78 @@ input[type=radio]:checked:after {
         opacity   : 1;
         transform : translateY(0vh);
     }
+}
+
+.tab-selector {
+    display        : flex;
+    flex-direction : column;
+}
+
+.settings-area .tab-selector .selector {
+    display          : inline-flex;
+    align-items      : center;
+    justify-content  : center;
+    height           : 3rem;
+    text-align       : center;
+    background-color : var(--thm-modal-btn-color);
+    border-bottom    : 1px solid var(--thm-border-color);
+}
+
+.settings-area .tab-selector .selector:hover {
+    background-color : var(--thm-modal-btn-hvr-color);
+}
+
+.settings-area .tab-selector .selector:active {
+    background-color : var(--thm-modal-btn-clk-color);
+}
+
+.settings-area .tab-selector .selector:nth-of-type(1) {
+    border-top : 1px solid var(--thm-border-color);
+}
+
+.options {
+    overflow        : auto;
+    scroll-behavior : smooth;
+}
+
+.options .tab-section {
+    position   : relative;
+    min-height : 100%;
+}
+
+.options .tab-section .descriptor {
+    width           : 100%;
+    margin          : 0;
+    border-bottom   : 1px solid var(--thm-border-color);
+    height          : 2rem;
+    display         : inline-flex;
+    text-align      : center;
+    align-items     : center;
+    justify-content : center;
+}
+
+.editor.tabs .tab {
+    border-left    : 1px solid var(--thm-border-color);
+    pointer-events : none;
+    /*display        : inline-block; !*  This prevents cursor from moving freely between tabs...? But the tabs look better with it turned on  *!*/
+}
+
+.editor.spaces .space {
+    position         : relative;
+    border-radius    : var(--fs-code);
+    background       : radial-gradient(circle, var(--thm-border-color) 0%, var(--thm-border-color) 15%, transparent 20%);
+}
+
+/* Temporary only */
+#font option {
+    background-color : black;
+    color            : white;
+}
+
+.no-animate,
+.no-animate *,
+.no-animate *:before,
+.no-animate *:after {
+    animation  : none !important;
+    transition : none !important;
 }

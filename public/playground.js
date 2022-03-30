@@ -30,6 +30,7 @@ import {
           run_btn          = document.querySelector('.run'),
           theme_btn        = document.querySelector('.theme'),
           settings_btn     = document.querySelector('.settings'),
+          settings_modal   = document.querySelector('.settings-modal'),
           play_name        = document.querySelector('#playground-name'),
           themes           = document.querySelector('.themes'),
           theme_btns       = document.querySelector('.theme-selector .btns'),
@@ -37,22 +38,139 @@ import {
           theme_search     = document.querySelector('.theme-selector .theme-search'),
           download_thm     = document.querySelector('.btns .btn.download'),
           upload_thm       = document.querySelector('.btns .btn.upload'),
-          clear_cache      = document.querySelector('.btn.clear-all.cache'),
           main             = document.querySelector('.main');
 
     let   theme_opts       = document.querySelectorAll('.themes .theme-opt');
-
-
-    const max_recommended_encoded_len = 2000,
-          thm_regex                   = /[\[\]()*!#$%^+={}|\\"'<>,/:;?@& ]/g;
-
-    let waiting_for_link = false,
-        custom_theme_key = null;
 
     const ui     = new UI(),
           notifs = new Notification(ui);
 
     await ui.start();
+
+    const max_recommended_encoded_len = 2000,
+          thm_regex                   = /[^\dA-Za-z\-]/g;
+
+    /* Settings Init */
+    const default_settings = {
+        'font-size'       : 14,
+        'line-height'     : 1,
+        'tab-size'        : 4,
+        'font'            : 0,
+        'syntax-on'       : true,
+        'tabs-as-space'   : false,
+        'smooth-scroll'   : false,
+        'show-space'      : false,
+        'show-tabs'       : false,
+        'no-animate'      : false,
+        'font-ligatures'  : false,
+    };
+    let settings_json = idb.toJSON(await idb.getItem('settings')) ?? default_settings;
+
+    // lex, and highlight, just a wrapper for the `lex` function from WASM
+    const colorize = input => {
+        if (settings_json['syntax-on'])
+            return lex(input);
+        else
+            return input;
+    };
+
+    const syntax            = document.querySelector('#syntax-highlight'),
+          font_size         = document.querySelector('#font-size'),
+          line_height       = document.querySelector('#line-height'),
+          smooth_scroll     = document.querySelector('#smooth-scroll'),
+          show_space        = document.querySelector('#show-space'),
+          show_tabs         = document.querySelector('#show-tabs'),
+          tab_size          = document.querySelector('#tab-size'),
+          tab_as_space      = document.querySelector('#tabs-as-space'),
+          no_animate        = document.querySelector('#no-animate'),
+          font              = document.querySelector('#font'),
+          ligatures         = document.querySelector('#ligatures');
+
+    const apply_settings_value = () => {
+        syntax       .checked = settings_json['syntax-on'];
+        ligatures    .checked = settings_json['font-ligatures'];
+        smooth_scroll.checked = settings_json['smooth-scroll'];
+        show_space   .checked = settings_json['show-space'];
+        show_tabs    .checked = settings_json['show-tabs'];
+        tab_as_space .checked = settings_json['tabs-as-space'];
+        no_animate   .checked = settings_json['no-animate'];
+
+        font_size  .value = settings_json['font-size'];
+        line_height.value = settings_json['line-height'];
+        tab_size   .value = settings_json['tab-size'];
+
+        font.selectedIndex = settings_json['font'];
+    }
+
+    const apply_settings = async settings => {
+        // copy settings object
+        settings_json = { ...settings };
+        if (settings_json['font-size'] > 72 || settings_json['font-size'] <= 8) {
+            notifs.set_type('n-warn');
+            notifs.send('Are you SURE the font size you chose isn\'t a bit too extreme?');
+        }
+        if (settings_json['tab-size'] > 16 || settings_json['tab-size'] <= 1) {
+            notifs.set_type('n-warn');
+            notifs.send('Are you SURE the tab size you chose isn\'t a bit too extreme?');
+        }
+        if (settings_json['line-height'] < 1.0) {
+            notifs.set_type('n-warn');
+            notifs.send('Are you sure you want to set the line height less than one? This can be hard to read!');
+        }
+        if (settings_json['line-height'] > 5){
+            notifs.set_type('n-warn');
+            notifs.send(
+                'Are you sure you want to set the line height this high? Very little text will fit in the editor!'
+            );
+        }
+        editor.innerHTML = colorize(editor.textContent);
+        // font size
+        document.documentElement.style.setProperty('--fs-code', settings_json['font-size'] + 'px');
+        const lh =
+            window.getComputedStyle(document.documentElement)
+                .getPropertyValue('--lh-default') ?? '1rem';
+        document.documentElement.style.setProperty(
+            '--lh-code',
+            `calc(${lh} * ${settings_json['line-height']})`
+        );
+        // font ligatures
+        document.documentElement.style.setProperty(
+            '--ligatures-code',
+            settings_json['font-ligatures'] ? 'contextual' : 'none'
+        );
+        // smooth scroll in editor
+        document.documentElement.style.setProperty(
+            '--ed-term-scroll',
+            settings_json['smooth-scroll'] ? 'smooth' : 'normal'
+        );
+        // tab size
+        document.documentElement.style.setProperty('--tab-size-code', settings_json['tab-size']);
+        // font
+        document.documentElement.style.setProperty(
+            '--ff-code',
+            `var(--ff-${font.options[settings_json['font'] ?? 0].value})`
+        );
+        // space indicators
+        settings_json['show-space'] ?
+            editor.classList.add('spaces') :
+            editor.classList.remove('spaces');
+        // tab indicators
+        settings_json['show-tabs'] ?
+            editor.classList.add('tabs') :
+            editor.classList.remove('tabs');
+        // animations and transitions
+        settings_json['no-animate'] ?
+            document.documentElement.classList.add('no-animate') :
+            document.documentElement.classList.remove('no-animate');
+        apply_settings_value();
+        await idb.setItem('settings', settings_json);
+    }
+
+    await apply_settings(settings_json);
+    /* Settings End Init */
+
+    let waiting_for_link = false,
+        custom_theme_key = null;
 
     let theme = await idb.getItem('theme');
     if (theme) {
@@ -78,9 +196,6 @@ import {
 
     // disgusting way to allow CSS animations to run, before removing element
     setTimeout(() => load_screen.remove(), 1000);
-
-    // lex, and highlight, just a wrapper for the `lex` function from WASM
-    const colorize = input => lex(input);
 
     // load contents of the editor
     const load_default = async () => {
@@ -202,11 +317,13 @@ import {
         if (e.key === 'Tab' || (e.keyCode || e.which) === 9) {
             e.preventDefault();
             const rng  = sel.getRangeAt(0),
-                  span = document.createElement('span');
-            span.appendChild(document.createTextNode('\t'));
+                  span = document.createElement('span'),
+                  tab  = settings_json['tabs-as-space'] ? ' '.repeat(settings_json['tab-size']) : '\t';
+            span.appendChild(document.createTextNode(tab));
             rng.deleteContents();
             rng.insertNode(span);
             rng.collapse(false);
+            input(e);
         }
 
         // modified from SO answer: https://stackoverflow.com/a/20398132
@@ -314,6 +431,7 @@ import {
         );
     });
 
+    // theme modal stuff
     // Blur, or un-blur the background when opening and closing the theme modal
     const set_theme_modal = (open) => {
         if (open) {
@@ -327,13 +445,6 @@ import {
     }
 
     theme_btn.addEventListener('click', _ => set_theme_modal(true));
-
-    settings_btn.addEventListener('click', _ => {
-        notifs.set_type('n-warn');
-        notifs.send(
-            'The settings pane is not currently implemented and will be implemented in future releases.'
-        );
-    });
 
     theme_search.addEventListener('input', _ => {
         const values =
@@ -537,11 +648,6 @@ import {
 
     thm_cancel.addEventListener('click', close_thm_modal);
 
-    document.addEventListener('keydown', async e => {
-        if (e.key === 'Escape' || (e.keyCode || e.which) === 27)
-            await close_thm_modal();
-    });
-
     download_thm.addEventListener('click', async _ => {
         let theme       = current_theme.value;
         theme.author    = '[add your name or nickname here]';
@@ -617,19 +723,152 @@ import {
             }
         });
     });
-    let cache_clear_state = false;
-    clear_cache.addEventListener('click', async _ => {
-        if (!cache_clear_state) {
-            cache_clear_state       = true;
-            clear_cache.textContent = "Are you SURE?";
-            return;
+
+    const clear_select = async (btn) => {
+        console.log('hello');
+        if (btn.classList.contains('all-cache')) {
+            await idb.clear();
+            await load_default_theme();
+            previous_theme = current_theme;
+            notifs.set_type('n-success');
+            notifs.send("Cleared cached data successfully!");
+        } else if (btn.classList.contains('theme-cache')) {
+            await idb.setItem('custom-theme', '');
+            await idb.setItem('theme', '');
+            await load_default_theme();
+            previous_theme = current_theme;
+            notifs.set_type('n-success');
+            notifs.send("Cleared cached theme data successfully!");
+        } else if (btn.classList.contains('editor-cache')) {
+            await idb.setItem('editor-content', '');
+            notifs.set_type('n-success');
+            notifs.send("Cleared cached editor content data successfully!");
+        } else if (btn.classList.contains('settings-cache')) {
+            await idb.setItem('settings', default_settings);
+            await apply_settings(default_settings);
+            notifs.set_type('n-success');
+            notifs.send("Cleared and reset settings successfully!");
+        } else if (btn.classList.contains('db-cache')) {
+            await idb.setItem('db-mode', '');
+            notifs.set_type('n-success');
+            notifs.send("Cleared database cache successfully!");
         }
-        await load_default_theme();
-        previous_theme = current_theme;
-        await idb.clear();
-        clear_cache.textContent = "Clear All Cached Data";
-        cache_clear_state       = false;
-        notifs.set_type('n-success');
-        notifs.send("Cleared cached data successfully!");
+    };
+
+    let clear_btns = document.querySelectorAll('.btn.clear');
+    for(const btn of clear_btns) {
+        btn.setAttribute('state', 'false');
+        btn.addEventListener('click', async () => {
+            if (btn.getAttribute('state') === 'false') {
+                btn.setAttribute('state', 'true');
+                btn.setAttribute('prev-val', btn.textContent);
+                btn.textContent = "Are you SURE?";
+                return;
+            }
+            await clear_select(btn);
+            btn.textContent = btn.getAttribute('prev-val') ?? 'Clear Cache';
+            btn.setAttribute('state', 'false');
+        });
+    }
+
+    // settings modal stuff here
+    const set_settings_modal = (open) => {
+        if (open) {
+            settings_modal.style.display = 'flex';
+            settings_modal.classList.remove('hidden');
+            main.classList.add('blurred');
+        } else {
+            settings_modal.classList.add('hidden');
+            main.classList.remove('blurred');
+        }
+    }
+
+    settings_btn.addEventListener('click', _ => {
+        set_settings_modal(true);
     });
+
+    settings_modal.addEventListener('click', e => {
+        if (!e.target.closest('.settings-area'))
+            set_settings_modal(false);
+    });
+
+    const settings_apply  = document.querySelector('.settings-area .btns .btn.apply'),
+          settings_cancel = document.querySelector('.settings-area .btns .btn.cancel'),
+          settings_ok     = document.querySelector('.settings-area .btns .btn.ok');
+
+    let new_settings_json = { ...settings_json };
+
+    settings_apply .addEventListener('click', async _ => apply_settings(new_settings_json));
+    settings_ok    .addEventListener('click',  _ => {
+        apply_settings(new_settings_json);
+        set_settings_modal(false);
+    });
+    settings_cancel.addEventListener('click',  _ => {
+        new_settings_json = { ...settings_json };
+        apply_settings_value();
+        console.log(settings_json);
+        set_settings_modal(false);
+    });
+
+    // setting toggles
+    // checkboxes
+    syntax.addEventListener('input', function (_) {
+        new_settings_json['syntax-on'] = this.checked;
+    });
+
+    ligatures.addEventListener('input', function (_) {
+        new_settings_json['font-ligatures'] = this.checked;
+    });
+
+    smooth_scroll.addEventListener('input', function (_) {
+        new_settings_json['smooth-scroll'] = this.checked;
+    });
+
+    show_space.addEventListener('input', function (_) {
+        new_settings_json['show-space'] = this.checked;
+    });
+
+    show_tabs.addEventListener('input', function (_) {
+        new_settings_json['show-tabs'] = this.checked;
+    });
+
+    tab_as_space.addEventListener('input', function (_) {
+        new_settings_json['tabs-as-space'] = this.checked;
+    });
+
+    no_animate.addEventListener('input', function (_) {
+        new_settings_json['no-animate'] = this.checked;
+    });
+
+    // number inputs
+    tab_size.addEventListener('input', function (_) {
+        const val = parseFloat(this.value);
+        new_settings_json['tab-size'] = isNaN(val) ? default_settings['tab-size'] : val;
+    });
+
+    font_size.addEventListener('input', function (_) {
+        const val = parseFloat(this.value);
+        new_settings_json['font-size'] = isNaN(val) ? default_settings['font-size'] : val;
+    });
+
+    line_height.addEventListener('input', function (_) {
+        const val = parseFloat(this.value);
+        new_settings_json['line-height'] = isNaN(val) ? default_settings['line-height'] : val;
+    });
+
+    // dropdowns
+    font.addEventListener('input', function (_) {
+        let idx = this.selectedIndex;
+        new_settings_json['font'] = idx === -1 ? 0 : idx;
+    });
+
+    // close theme & settings modal when escape key is pressed
+    document.addEventListener('keydown', async e => {
+        if (e.key === 'Escape' || (e.keyCode || e.which) === 27) {
+            await close_thm_modal();
+            set_settings_modal(false);
+        }
+    });
+
+
 })();

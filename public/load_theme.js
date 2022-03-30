@@ -70,9 +70,19 @@ export function apply_theme(json) {
     style.set("modal-text-color"               , "modal-txt-color");
     style.set("modal-filter"                   , "modal-bd-filter");
     style.set("modal-selected-color"           , "modal-sltd-color");
+
+    style.set("modal-button-color"             , "modal-btn-color");
+    style.set("modal-button-hover-color"       , "modal-btn-hvr-color");
+    style.set("modal-button-press-color"       , "modal-btn-clk-color");
+
     style.set("modal-ok-button-color"          , "modal-ok-btn-color");
     style.set("modal-ok-button-hover-color"    , "modal-ok-btn-hvr-color");
     style.set("modal-ok-button-press-color"    , "modal-ok-btn-clk-color");
+
+    style.set("modal-apply-button-color"       , "modal-apply-btn-color");
+    style.set("modal-apply-button-hover-color" , "modal-apply-btn-hvr-color");
+    style.set("modal-apply-button-press-color" , "modal-apply-btn-clk-color");
+
     style.set("modal-cancel-button-color"      , "modal-cancel-btn-color");
     style.set("modal-cancel-button-hover-color", "modal-cancel-btn-hvr-color");
     style.set("modal-cancel-button-press-color", "modal-cancel-btn-clk-color");
@@ -132,6 +142,7 @@ export function apply_theme(json) {
     style.set("comment-color"      , "com-color");
     style.set("comment-decoration" , "com-dec");
 
+    // light and dark mode classes for the custom scrollbar on webkit browsers
     if (json.type === 'light') {
         document.documentElement.style.colorScheme = 'light';
         document.documentElement.classList.add('light');
@@ -143,7 +154,7 @@ export function apply_theme(json) {
         document.documentElement.classList.remove('light');
     }
 
-    console.log(`Theme '${ json.name }' loaded!`);
+    console.info(`Theme '${ json.name }' loaded!`);
 }
 
 export let current_theme  = null;
@@ -165,7 +176,7 @@ export async function load_theme(url) {
         }
     else
         try {
-            const res = await fetch(`/themes/${url}`);
+            const res = await fetch(`/themes/${ url }`);
             const json = await res.json();
             apply_theme(json);
             set_curr_theme(json, url);

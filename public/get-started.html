@@ -15,22 +15,27 @@ Right next to your tab, to the right or below (depending on your layout [section
 This bar allows you to open, close and select specific tabs.
 There are 5 tabs available in this bar:
     - Note: If you see less than 5 tabs, chances are your screen is too small to display all the tabs. In this case, an invisible scrollbar will appear, and you can scroll normally, even if you don't see a scrollbar.
+
     - Terminal
         - Unimplemented, but it is a to-be terminal for my language when you're going to be able to run it.
+
     - Notifications
         - This tab shows you any notifications that might be sent from the playground.
         - It will open automatically when a new notification is sent.
         - The new notification will be highlighted momentarily to help you identify it.
         - <b>Double clicking on a notification will remove it!</b>
         - <b>The Clear All button on the top of the notification tab will remove <u>all</u> of your notifications!</b>
+
     - Get Started
         - This tab you're reading right now, to help you get started with this playground!
+
     - Readme
         - Here you will see the latest release notes, i.e. what I changed in the specific "release"
         - You will also see the email I want you to send bugs / feature requests to.
         - Also, you will see the links for the repos of:
             - This web app you're currently viewing
             - The programming language I'm making
+
     - Project Settings
         - Here you will find options to change the playground name and playground storage options
             - Playground Name: Anything between 1-50 characters. If empty, a random name will be assigned for you
@@ -38,8 +43,6 @@ There are 5 tabs available in this bar:
                 - Database 1: The most tested, best for any size (long and short), and relatively fast database. Selected by default
                 - Database 2: The newest database, and supposedly the fastest. Good for short or medium entries. Long entries untested.
                 - Encoded URL: Stores the data in the URL. Anything above 2000 chars is not recommended, since the page won't load in some browsers, and will throw an error.
-            - Danger Zone:
-                - A clear all button that clears all cache, all custom themes, currently selected theme, and editor data. Think twice before pressing this button.
 <h4 class="heading">Section 1.2</h4>
 Depending on your layout settings and screen size, a layout is chosen:
     - Vertical
@@ -51,15 +54,18 @@ Now, for the bar at the top.
 Here, you will see 5 buttons, again:
     - The one to the far left, Run:
         - Will run the code. Currently, does nothing, since the language is unimplemented
+
     - The one next to it, with the link picture, Save:
         - Will save your "play" to either:
             - A database (db #1, or #2 depending on your choice)
             - Encoded URL
+
     - The next button is the layout button:
         - It is disabled on devices with screen width / height less than 400 pixels in size, and a layout for the best viewing will be picked for you automatically
         - On larger screens, clicking it will toggle the vertical or horizontal layouts
             - Vertical: Editor above, Tabs below
             - Horizontal: Editor to the left, Tabs to the right
+
     - The button right before the last one, to the far right is the theme button:
         - Clicking on this will open a modal with:
             - A search bar: Allows you to search for themes in the theme selector
@@ -69,7 +75,16 @@ Here, you will see 5 buttons, again:
             - An Upload button: Uploads a theme you made!
             - A Download button: Downloads the currently selected theme as a template for you to craft your own themes!
         - Try it now! Open the theme modal, select a theme, and click Ok!
-    - The last button, the settings button: It's not implemented currently, and will be implemented after I get rid of any pesky bugs and add a few more interesting features!
+
+    - The last button, the settings button, Clicking this will open a modal where:
+        - On the left are buttons that when clicked, will navigate to the appropriate section in the settings pane
+        - The right side contains various settings you can tinker with. Mainly:
+            - Tab Size: Change the tab size (number of characters a tab spans) of your tab character (default 4)
+            - Use Spaces For Tabs: Use [Tab Size] number spaces instead of a tab character (default off)
+            - Font Size: Change the size of the font (default 14)
+            - Font Ligatures: Enable ligatures, some character combinations are changed by the font to enable better readability (default off)
+            - Line Height: Distance between two lines in the Editor (default 1)
+            - The rest are probably not going to be used much, but you can certainly explore their functions!
 <h4 class="heading">Section 1.4</h4>
 Wondering what that pesky little bar between the editor and this tab is?
 Well, it's a resize bar! Try it!

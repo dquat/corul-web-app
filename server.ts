@@ -2,9 +2,17 @@
 import {Application, Context, Router, RouterContext, Status} from "https://deno.land/x/oak@v9.0.1/mod.ts";
 import * as sb from "./databases/sb-db.js";
 import * as fb from "./databases/fb-db.js";
-
-// await fb.add(null, 'wxyz');
-// await sb.add(null, 'abc');
+// import * as ab from "https://ga.jspm.io/npm:cassandra-driver@4.6.3/index.js";
+//
+// let _c = new ab.Client({
+//     cloud: {
+//         secureConnectBundle: "<<PATH/TO/>>secure-connect-database.zip",
+//     },
+//     credentials: {
+//         username: "<<CLIENT ID>>",
+//         password: "<<CLIENT SECRET>>",
+//     },
+// });
 
 const status = {
     ok    : 'ok',

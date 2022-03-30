@@ -4,10 +4,15 @@ const tb          = document.querySelector('.tool-bar'),
       main        = document.querySelector('.main'),
       footer      = document.querySelector('.footer-bar'),
       opener      = document.querySelector('.opener'),
+      options     = document.querySelector('.settings-area .options'),
+      selector    = document.querySelector('.settings-area .tab-selector'),
       resize_bar  = document.querySelector('.bar'),
+      sections    = options?.querySelectorAll('.tab-section'),
       tabs        = opener ?.querySelectorAll('.tab'),
       layout      = tb     ?.querySelector('.layout');
-const footer_children = [];
+
+const selector_children = [],
+      footer_children   = [];
 
 // generate relevant tab buttons and append them to the footer / sidebar
 if (tabs && tabs.length > 0) {
@@ -36,6 +41,24 @@ if (tabs && tabs.length > 0) {
     if (!open) // hide all tabs if none are open
         main.classList.add('hide');
     footer.append(...footer_children);
+}
+
+if (sections && sections.length) {
+    for (const section of sections) {
+        const btn = document.createElement('div'),
+              tab_name = section.getAttribute('tab-name');
+        btn.classList.add('btn');
+        btn.classList.add('selector');
+        btn.setAttribute('tab-name', tab_name);
+        btn.textContent = tab_name;
+        btn.addEventListener('click', function() {
+            let tb = this.getAttribute('tab-name');
+            if (tb)
+                document.querySelector(`.tab-section[tab-name="${tb}"]`)?.scrollIntoView();
+        });
+        selector_children.push(btn);
+    }
+    selector.append(...selector_children);
 }
 
 
@@ -244,6 +267,7 @@ export class Notification {
         this._root      =
             opener.querySelector('.notifications') || document.documentElement;
         this._base_cls  = base_class     || 'notification';
+        this._modal     = false;
         this._msg_cls   = message_class  || 'message';
         this._time_cls  = time_class     || 'time-stamp';
         this._hour24    = false;
@@ -258,6 +282,13 @@ export class Notification {
                 p.classList.add('no-notif-plchldr');
                 p.textContent = 'No new notifications!';
                 this._root.append(p);
+            }
+        });
+
+        document.addEventListener('click', () => {
+            // modal is open
+            if (main.classList.contains('blurred')) {
+
             }
         });
     }

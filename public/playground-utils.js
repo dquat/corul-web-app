@@ -24,7 +24,7 @@ fn main() {
 \t} else { // well, this can't ever happen!
 \t\tmain();
 \t}
-}`;
+}\n`;
 
 export function locate_cursor_pos(root, index) {
     // borrowed from SO answer: https://stackoverflow.com/a/38479462

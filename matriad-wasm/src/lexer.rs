@@ -135,6 +135,19 @@ impl<'a> Lexer<'a> {
             if self.eof() { break; }
             let &(_, char) = self.it.peek().unwrap();
             match char {
+                ' '  => {
+                    drop(self.it.next());
+                    add(&mut s, tag!("space"), " ");
+                },
+                '\t' => {
+                    drop(self.it.next());
+                    add(&mut s, tag!("tab"), "\t");
+                },
+                '\n' => {
+                    drop(self.it.next());
+                    add(&mut s, tag!("new-line"), "\n");
+                },
+
                 '\"' => {
                     mode = 0;
                     let mut first = true;
