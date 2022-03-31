@@ -100,13 +100,13 @@ export class UI {
     // I'm not using media queries only because, doing it in JS offers more flexibility.
     // To figure out weather a media query was triggered is not really that ideal...
     size_check() {
-        const cl = this.mode ?? 'horizontal';
-        const reset = (_this) => {
-            _this.window_small = false;
-            if (cl === 'horizontal') layout.classList.remove('flip');
-            else layout.classList.add('flip');
-            layout.classList.remove('disabled'); // disabled = false not working??
-        }
+        const cl    = this.mode ?? 'horizontal',
+              reset = (_this) => {
+                   _this.window_small = false;
+                   if (cl === 'horizontal') layout.classList.remove('flip');
+                   else layout.classList.add('flip');
+                   layout.classList.remove('disabled'); // disabled = false not working??
+              }
         if (window.innerHeight <= UI.MIN_HEIGHT || window.innerWidth <= UI.MIN_WIDTH) {
             this.window_small = true;
             if (window.innerWidth <= UI.MIN_WIDTH) {
@@ -143,10 +143,9 @@ export class UI {
 
     resize_tab(e, type) {
         // when using touch, resizing is sometimes laggy... wierd bug
-        const root = document.documentElement;
-        const cursor_style =
-            resize_bar.style.cursor ||
-            window.getComputedStyle(resize_bar).cursor;
+        const root         = document.documentElement,
+              cursor_style =
+                  resize_bar.style.cursor || window.getComputedStyle(resize_bar).cursor;
         // touch event stuff
         const orig_ev    = e.originalEvent ?? e,
               touches    = orig_ev?.touches || orig_ev?.changedTouches,
@@ -157,7 +156,7 @@ export class UI {
               ];
         switch (type) {
             case 'down': {
-                if(!e.type?.includes('touch')) e.preventDefault();
+                if (!e.type?.includes('touch')) e.preventDefault();
                 root.style.cursor = cursor_style;
                 this.resizing = true;
                 this.coords = { cx, cy };
@@ -165,18 +164,22 @@ export class UI {
             break;
             case 'move': {
                 if (this.resizing && this.coords) {
-                    if(!e.type?.includes('touch')) e.preventDefault();
-                    const [ pcx, pcy ] = [ this.coords.cx, this.coords.cy ]
-                    const [ ox, oy ] = [ pcx - cx, pcy - cy ];
-                    const opener_cs = window.getComputedStyle(opener);
+                    if (!e.type?.includes('touch')) e.preventDefault();
+                    const [ pcx, pcy ] = [ this.coords.cx, this.coords.cy ],
+                          [ ox, oy ]   = [ pcx - cx, pcy - cy ],
+                          opener_cs    = window.getComputedStyle(opener),
+                          bc           = document.documentElement.getBoundingClientRect();
                     if (main.classList.contains('horizontal')) {
+                        // using getBoundingClientRect to get floating precision viewport width & height
+                        const percent = (parseFloat(opener_cs.width) + ox) * 100 / bc.width;
                         document.documentElement
                             .style
-                            .setProperty('--tab-width', parseFloat(opener_cs.width) + ox + 'px');
+                            .setProperty('--tab-width',  percent + 'vw');
                     } else if (main.classList.contains('vertical')) {
+                        const percent = (parseFloat(opener_cs.height) + oy) * 100 / bc.height;
                         document.documentElement
                             .style
-                            .setProperty('--tab-height', parseFloat(opener_cs.height) + oy + 'px');
+                            .setProperty('--tab-height', percent + 'vh');
                     }
                     this.coords = { cx, cy };
                 }

@@ -23,9 +23,9 @@
     --tb-btn-size      : 1.6rem; /* Size of each button in the top bar */
     --bar-size         : 0.3rem; /* Width or height (depends on layout) of the resizer bar */
     /* Stupid. GRID! workaround for stupid grids. (setting these as 1fr makes em break. *sigh*) */
-    --tab-width        : calc(50vw - (var(--tb-ft-bar-size) / 2)); /* Width of left / bottom tab that can be opened and closed */
+    --tab-width        : calc(50vw - (var(--tb-ft-bar-size) / 2) - (var(--bar-size)) / 2); /* Width of left / bottom tab that can be opened and closed */
     --tab-height       : calc(50vh - (var(--tb-ft-bar-size) / 2) - (var(--bar-size)) / 2); /* Height of left / bottom tab that can be opened and closed */
-
+/*50vw = p/wh + bs / 2*/
     /*!* Theme colors *!*/
     /*--thm-main-color     : rgb(40 40 40); !* Main color of the theme, used the most *!*/
     /*--thm-code-color     : rgb(235 219 170); !* Default code color *!*/
