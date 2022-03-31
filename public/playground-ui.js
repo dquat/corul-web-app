@@ -171,12 +171,12 @@ export class UI {
                           bc           = document.documentElement.getBoundingClientRect();
                     if (main.classList.contains('horizontal')) {
                         // using getBoundingClientRect to get floating precision viewport width & height
-                        const percent = (parseFloat(opener_cs.width) + ox) * 100 / bc.width;
+                        const percent = (parseFloat(opener_cs.width) + ox) * 100 / (bc.width ?? window.innerWidth);
                         document.documentElement
                             .style
                             .setProperty('--tab-width',  percent + 'vw');
                     } else if (main.classList.contains('vertical')) {
-                        const percent = (parseFloat(opener_cs.height) + oy) * 100 / bc.height;
+                        const percent = (parseFloat(opener_cs.height) + oy) * 100 / (bc.height ?? window.innerHeight);
                         document.documentElement
                             .style
                             .setProperty('--tab-height', percent + 'vh');
