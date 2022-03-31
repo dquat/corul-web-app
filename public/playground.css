@@ -241,6 +241,10 @@ input[type=text]:focus, input[type=number]:focus {
     box-shadow : var(--thm-inp-fcs-border) 0 0 1px 3px;
 }
 
+.tab-section input[type=number] {
+    max-width : 50%;
+}
+
 /* Style the radio button */
 label.radio, .theme-opt, label.checkbox, label.number, label.select {
     display     : flex;
@@ -701,7 +705,7 @@ input[type=radio]:checked:after {
     position                : fixed;
     top                     : 0;
     left                    : 0;
-    z-index                 : 1000000;
+    z-index                 : 999999;
     flex-direction          : column;
 }
 
@@ -950,8 +954,9 @@ input[type=radio]:checked:after {
 }
 
 .options .tab-section {
-    position   : relative;
-    min-height : 100%;
+    position      : relative;
+    padding-right : calc(7px /* Scrollbar width */ + 0.5rem /* Grid area gap */ / 2);
+    min-height    : 100%;
 }
 
 .options .tab-section .descriptor {
@@ -989,4 +994,15 @@ input[type=radio]:checked:after {
 .no-animate *:after {
     animation  : none !important;
     transition : none !important;
+}
+
+.floating-notifs {
+    display          : none;
+    position         : fixed;
+    width            : 100%;
+    height           : fit-content;
+    z-index          : 9999999;
+    padding          : 1rem;
+    background-color : transparent;
+    pointer-events   : none;
 }

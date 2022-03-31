@@ -191,7 +191,8 @@ export class UI {
 
     async start() {
         // First class must always be `horizontal` or `vertical` to work
-        this.mode = await idb.getItem('layout') ?? main.classList[0];
+        let _l = await idb.getItem('layout');
+        this.mode = _l ? _l : main.classList[0];
         for (const child of footer_children)
             child.addEventListener('click', this.footer_btn_click.bind(this, child));
         if (layout) // will always be true, for this website, but anyway...
@@ -263,15 +264,18 @@ export class Notification {
         message_class,
         time_class   ,
     ) {
-        this.ui         = ui;
-        this._root      =
+        this.ui          = ui;
+        this._root       =
             opener.querySelector('.notifications') || document.documentElement;
-        this._base_cls  = base_class     || 'notification';
-        this._modal     = false;
-        this._msg_cls   = message_class  || 'message';
-        this._time_cls  = time_class     || 'time-stamp';
-        this._hour24    = false;
-        this._type      = null;
+        this._modal_root =
+            document.querySelector('.floating-notifs') || document.documentElement;
+        this._duration   = 5000;
+        this._modal      = false;
+        this._base_cls   = base_class     || 'notification';
+        this._msg_cls    = message_class  || 'message';
+        this._time_cls   = time_class     || 'time-stamp';
+        this._hour24     = false;
+        this._type       = null;
         this._root
             .querySelector('.clear-all')
             .addEventListener('click', _ => {
@@ -284,21 +288,28 @@ export class Notification {
                 this._root.append(p);
             }
         });
-
-        document.addEventListener('click', () => {
-            // modal is open
-            if (main.classList.contains('blurred')) {
-
-            }
-        });
     }
 
+    // unused
     set_date_fmt(hour_24_format) {
         this._hour24 = hour_24_format;
     }
 
+    // unused
+    set_modal_duration(dur = 1000) {
+        this._duration = dur;
+    }
+
     set_type(type) {
         this._type = type;
+    }
+
+    set_modal(open = false) {
+        this._modal = open;
+        if (open)
+            this._modal_root.style.display = 'block';
+        else
+            this._modal_root.style.display = 'none';
     }
 
     _pad(value) {
@@ -319,11 +330,39 @@ export class Notification {
     }
 
     send(value = "Unknown message") {
+        let time_stamp;
+        if (this._time_cls) {
+            time_stamp             = document.createElement("span");
+            time_stamp.textContent = this._gen_ts();
+            time_stamp.classList.add(this._time_cls);
+        }
+
+        if (this._modal) {
+            const base      = document.createElement("div"),
+                  text_span = document.createElement("span");
+
+            text_span.append(value.nodeType ? value.cloneNode(true) : value);
+            base     .append(text_span);
+
+            text_span.classList.add(this._msg_cls);
+            base     .classList.add(this._base_cls);
+
+            if (this._type)
+                base.classList.add(this._type);
+
+            if (time_stamp)
+                base.append(time_stamp.cloneNode(true));
+
+            setTimeout(() => base.remove(), this._duration);
+
+            this._modal_root.append(base);
+        }
 
         const q = this._root.querySelector('.no-notif-plchldr');
         if (q) q.remove();
 
-        this.ui.move_to_tab({ id: this._root.classList[0] });
+        if (!this._modal)
+            this.ui.move_to_tab({ id: this._root.classList[0] });
 
         const base      = document.createElement("div"),
               text_span = document.createElement("span");
@@ -339,12 +378,8 @@ export class Notification {
         if (this._type)
             base.classList.add(this._type);
 
-        if (this._time_cls) {
-            const time_stamp = document.createElement("span");
-            time_stamp.textContent = this._gen_ts();
-            time_stamp.classList.add(this._time_cls);
+        if (time_stamp)
             base.append(time_stamp);
-        }
 
         this._root.append(base);
         this._type = null;

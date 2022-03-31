@@ -1,23 +1,18 @@
-import init, { lex } from './matriad_wasm.js';
+import init, {lex, random_name} from './matriad_wasm.js';
 import * as idb from './indexedDB.js';
 
-import { Notification, UI } from './playground-ui.js';
+import {Notification, UI} from './playground-ui.js';
+
+import {current_theme, load_default_theme, load_theme, thm_load_err,} from './load_theme.js';
 
 import {
-    current_theme,
-    thm_load_err,
-    load_default_theme,
-    load_theme,
-} from './load_theme.js';
-
-import {
-    default_input,
-    formatted_stringify_JSON,
-    locate_cursor_pos,
-    decode_unicode,
-    encode_unicode,
-    load,
     add,
+    decode_unicode,
+    default_input,
+    encode_unicode,
+    formatted_stringify_JSON,
+    load,
+    locate_cursor_pos,
 } from './playground-utils.js';
 
 (async () => {
@@ -58,6 +53,7 @@ import {
         'font'            : 0,
         'syntax-on'       : true,
         'tabs-as-space'   : false,
+        'hour-24'         : false,
         'smooth-scroll'   : false,
         'show-space'      : false,
         'show-tabs'       : false,
@@ -84,6 +80,7 @@ import {
           tab_as_space      = document.querySelector('#tabs-as-space'),
           no_animate        = document.querySelector('#no-animate'),
           font              = document.querySelector('#font'),
+          hour24            = document.querySelector('#use-24-hr'),
           ligatures         = document.querySelector('#ligatures');
 
     const apply_settings_value = () => {
@@ -94,6 +91,7 @@ import {
         show_tabs    .checked = settings_json['show-tabs'];
         tab_as_space .checked = settings_json['tabs-as-space'];
         no_animate   .checked = settings_json['no-animate'];
+        hour24       .checked = settings_json['hour-24'];
 
         font_size  .value = settings_json['font-size'];
         line_height.value = settings_json['line-height'];
@@ -162,6 +160,9 @@ import {
         settings_json['no-animate'] ?
             document.documentElement.classList.add('no-animate') :
             document.documentElement.classList.remove('no-animate');
+        // 24 hour time
+        notifs.set_date_fmt(settings_json['hour-24']);
+
         apply_settings_value();
         await idb.setItem('settings', settings_json);
     }
@@ -182,7 +183,7 @@ import {
             } else
                 await load_theme(theme);
         } catch (e) {
-            console.log('Failed to load custom theme! Error:', e);
+            console.error('Failed to load custom theme! Error:', e);
             await load_default_theme();
         }
     }
@@ -212,10 +213,14 @@ import {
 
     if (b64) {
         try {
-            const contents = decode_unicode(b64.replace(/ /g, '+'));
+            const encoded_name = params.get('n'),
+                  contents     = decode_unicode(b64.replace(/ /g, '+'));
+            play_name.value  = encoded_name ?
+                decode_unicode(encoded_name.replace(/ /g, '+')) :
+                random_name(3);
             editor.innerHTML = colorize(contents);
             notifs.set_type('n-success');
-            notifs.send('Loaded contents in URL successfully!');
+            notifs.send(`Loaded playground ${ play_name.value } from URL successfully!`);
         } catch (e) {
             if (e) {
                 console.error("Failed to convert URL to snippet:", e);
@@ -228,15 +233,15 @@ import {
         try {
             const type = params.get('t');
             if (!type) throw "Expected a database type in URL. Please ensure you entered the URL in correctly.";
-            const then = Date.now();
-            const res = await load(id, type);
+            const then = Date.now(),
+                  res  = await load(id, type);
             // should be true always if no errors occur during load, but still
             if (res?.value)
                 editor.innerHTML = colorize(res.value);
             if (res?.name)
                 play_name.value = res.name;
             notifs.set_type('n-success');
-            notifs.send(`Loaded content successfully in ${ Date.now() - then }ms!`);
+            notifs.send(`Loaded playground ${ play_name.value } successfully in ${ Date.now() - then }ms!`);
         } catch (e) {
             if (e) {
                 notifs.set_type('n-err');
@@ -271,20 +276,20 @@ import {
     check_load_err();
 
     const input = _ => {
-        const sel = window.getSelection();
-        const rng = sel.getRangeAt(0);
+        const sel = window.getSelection(),
+              rng = sel.getRangeAt(0);
         rng.setStart(editor, 0);
         // get the current position of the cursor (absolute to editor)
-        const len = rng.toString().length
-        let   tc  = editor.textContent ?? editor.innerText;
+        const len = rng.toString().length,
+              tc  = editor.textContent ?? editor.innerText;
         editor.innerHTML =
             colorize(tc)
             // fixes bug in chromium (wants 2 '\n's at the end of input for 1 '\n')
             // and maybe firefox has the same issue too?...
             + (tc.slice(-1) !== '\n' ? '\n' : '');
         // restore the cursor's position, i.e. find which element and where the cursor must be put
-        let { node, position } = locate_cursor_pos(editor, len);
-        let range              = document.createRange();
+        const { node, position } = locate_cursor_pos(editor, len),
+              range              = document.createRange();
         sel.removeAllRanges();
         range.setStart(node, position);
         range.setEnd(node, position);
@@ -301,11 +306,11 @@ import {
         // some copy-paste text is not formatted correctly due to .textContent reading it incorrectly
         // so the paste event is used as a workaround for this issue
         e.preventDefault();
-        let txt =
+        const txt =
             (e.clipboardData || window.clipboardData).getData('text')
-                .replace(/\r/g, '');
-        let sel = window.getSelection();
-        let rng = sel.getRangeAt(0);
+                .replace(/\r/g, ''),
+              sel = window.getSelection(),
+              rng = sel.getRangeAt(0);
         sel.deleteFromDocument();
         rng.insertNode(document.createTextNode(txt));
         rng.collapse(false);
@@ -368,10 +373,11 @@ import {
                     `Storing more than ${ max_recommended_encoded_len } characters of code, encoded is not recommended. Please use the database to store the data instead.`
                 );
             }
-            let gen_url = encode_unicode(editor.textContent);
-            let link = `${ window.location.pathname }?b=${ gen_url }`;
+            const encoded = encode_unicode(editor.textContent),
+                  name    = encode_unicode(play_name.value ? play_name.value : random_name(3)),
+                  link    = `${ window.location.pathname }?b=${ encoded }&n=${ name }`;
             window.history.replaceState(null, null, link);
-            let abs_link =
+            const abs_link =
                 `${ window.location.protocol }//${ window.location.hostname }${ window.location.port ? ':' + window.location.port : '' }` + link;
             notifs.set_type('n-info');
             let el;
@@ -406,9 +412,9 @@ import {
             notifs.send(`Failed to add to database! ${e}`);
             return;
         }
-        let link = `${ window.location.pathname }?i=${ res.id }&t=${ type }`;
+        const link = `${ window.location.pathname }?i=${ res.id }&t=${ type }`;
         window.history.replaceState(null, null, link);
-        let abs_link =
+        const abs_link =
             `${ window.location.protocol }//${ window.location.hostname }${ window.location.port ? ':' + window.location.port : '' }` + link;
 
         notifs.set_type('n-info');
@@ -434,6 +440,7 @@ import {
     // theme modal stuff
     // Blur, or un-blur the background when opening and closing the theme modal
     const set_theme_modal = (open) => {
+        notifs.set_modal(open);
         if (open) {
             theme_modal.style.display = 'flex';
             theme_modal.classList.remove('hidden');
@@ -483,13 +490,13 @@ import {
             await load_theme(file);
         else {
             try {
-                let json = idb.toJSON(await idb.getItem(idb_key));
+                const json = idb.toJSON(await idb.getItem(idb_key));
                 await load_theme(json);
                 custom_theme_key = idb_key;
             } catch (e) {
                 notifs.set_type('n-err');
                 notifs.send('Failed to load theme! ' + e);
-                console.log('Failed to load theme! Error', e);
+                console.error('Failed to load theme! Error', e);
             }
         }
         check_load_err();
@@ -555,11 +562,11 @@ import {
     // fetch all available themes from server
     let theme_items;
     try {
-        const _thm_fetch = await fetch('/themes/.theme-map.generated.json', {
+        const _thm_fetch     = await fetch('/themes/.theme-map.generated.json', {
             method: 'GET',
             headers: { 'Accept': 'application/json' }
-        });
-        const fetched_themes = await _thm_fetch.json();
+        }),
+              fetched_themes = await _thm_fetch.json();
 
         theme_items = fetched_themes.items;
         for(const item of theme_items)
@@ -569,11 +576,11 @@ import {
     } catch (e) {
         notifs.set_type('n-err');
         notifs.send('Failed to load themes! ' + e);
-        console.log('Failed to load themes! Reason:', e);
+        console.error('Failed to load themes! Reason:', e);
     }
 
     try {
-        let list = idb.toJSON(await idb.getItem('theme-key-list'));
+        const list = idb.toJSON(await idb.getItem('theme-key-list'));
         if (list)
             for(const item of list) {
                 const json = idb.toJSON(await idb.getItem(item));
@@ -582,7 +589,7 @@ import {
 
         theme_opts = document.querySelectorAll('.themes .theme-opt');
     } catch (e) {
-        console.log('Failed to load custom themes! Error', e);
+        console.error('Failed to load custom themes! Error', e);
     }
 
     const close_thm_modal = async _ => {
@@ -606,8 +613,8 @@ import {
             close_thm_modal();
     });
 
-    const thm_ok     = theme_btns.querySelector('.ok');
-    const thm_cancel = theme_btns.querySelector('.cancel');
+    const thm_ok     = theme_btns.querySelector('.ok'),
+          thm_cancel = theme_btns.querySelector('.cancel');
 
     const find_theme = url => {
         for (const opt of theme_opts) {
@@ -634,7 +641,7 @@ import {
             return;
         }
         previous_theme = current_theme;
-        let selected =
+        const selected =
             document.querySelector('input[type=radio][name=theme-selector]:checked');
         if (selected?.parentElement?.hasAttribute('data-file')) {
             await idb.setItem('custom-theme', false);
@@ -649,14 +656,14 @@ import {
     thm_cancel.addEventListener('click', close_thm_modal);
 
     download_thm.addEventListener('click', async _ => {
-        let theme       = current_theme.value;
+        const theme     = current_theme.value;
         theme.author    = '[add your name or nickname here]';
         theme.type      = '[add the type of your theme here (light or dark only)]';
         theme.name      = '[add the name of your theme here]';
         const a         = document.createElement('a');
         a.href          = "data:text/json;charset=utf-8," + encodeURIComponent(formatted_stringify_JSON(theme));
         a.download      =
-            `theme-${current_theme.author.replace(thm_regex, '-')}-${current_theme.name.replace(thm_regex, '-')}.json`;
+            `theme-${ current_theme.author.replace(thm_regex, '-') }-${ current_theme.name.replace(thm_regex, '-') }.json`;
         a.hidden        = true;
         a.style.display = 'none';
         document.body.append(a);
@@ -693,7 +700,7 @@ import {
                     check_load_err();
 
                     // create a theme option, and create a theme-key for the newly uploaded theme
-                    const idb_key = `theme-${parsed.name}-${parsed.author}-${parsed.type}`;
+                    const idb_key = `theme-${ parsed.name }-${ parsed.author }-${ parsed.type }`;
                     create_theme_opt(parsed.name, parsed.author, parsed.type, null, idb_key);
                     await idb.setItem(idb_key, parsed);
 
@@ -711,21 +718,20 @@ import {
                     } catch (e) {
                         notifs.set_type('n-err');
                         notifs.send('Failed to add custom theme! ' + e);
-                        console.log('Error adding to custom theme list! Error:', e);
+                        console.error('Error adding to custom theme list! Error:', e);
                     }
 
                     theme_opts = document.querySelectorAll('.themes .theme-opt');
                 } catch (e) {
                     notifs.set_type('n-err');
                     notifs.send('Failed to add custom theme! ' + e);
-                    console.log('Error loading file:', e);
+                    console.error('Error loading file:', e);
                 }
             }
         });
     });
 
     const clear_select = async (btn) => {
-        console.log('hello');
         if (btn.classList.contains('all-cache')) {
             await idb.clear();
             await load_default_theme();
@@ -743,6 +749,10 @@ import {
             await idb.setItem('editor-content', '');
             notifs.set_type('n-success');
             notifs.send("Cleared cached editor content data successfully!");
+        } else if (btn.classList.contains('layout-cache')) {
+            await idb.setItem('layout', '');
+            notifs.set_type('n-success');
+            notifs.send("Cleared layout cache successfully!");
         } else if (btn.classList.contains('settings-cache')) {
             await idb.setItem('settings', default_settings);
             await apply_settings(default_settings);
@@ -773,6 +783,7 @@ import {
 
     // settings modal stuff here
     const set_settings_modal = (open) => {
+        notifs.set_modal(open);
         if (open) {
             settings_modal.style.display = 'flex';
             settings_modal.classList.remove('hidden');
@@ -806,7 +817,6 @@ import {
     settings_cancel.addEventListener('click',  _ => {
         new_settings_json = { ...settings_json };
         apply_settings_value();
-        console.log(settings_json);
         set_settings_modal(false);
     });
 
@@ -840,6 +850,10 @@ import {
         new_settings_json['no-animate'] = this.checked;
     });
 
+    hour24.addEventListener('input', function (_) {
+        new_settings_json['hour-24'] = this.checked;
+    });
+
     // number inputs
     tab_size.addEventListener('input', function (_) {
         const val = parseFloat(this.value);
@@ -869,6 +883,4 @@ import {
             set_settings_modal(false);
         }
     });
-
-
 })();

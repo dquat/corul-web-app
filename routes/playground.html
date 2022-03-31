@@ -141,6 +141,7 @@
     <div class="loader"></div>
     <div class="load-msg">Loading</div>
 </div>
+<div class="floating-notifs"></div>
 <div class="horizontal main grid">
     <div class="tool-bar flex">
         <div class="tb-name">The Matriad Playground v0.0.9</div>
@@ -284,6 +285,10 @@ Unimplemented because language is not even in a workable condition!</div>
                     <input type="checkbox" id="no-animate" />
                     Disable Animations
                 </label>
+                <label class="checkbox" for="use-24-hr">
+                    <input type="checkbox" id="use-24-hr" />
+                    Use 24 Hour Time
+                </label>
                 <label class="checkbox" for="show-tabs">
                     <input type="checkbox" id="show-tabs" />
                     Show Tabs
@@ -328,7 +333,7 @@ Unimplemented because language is not even in a workable condition!</div>
             </div>
             <div class="tab-section" tab-name="Danger Zone">
                 <h3 class="descriptor">Danger Zone</h3>
-                <div><u><b>NOTE:</b></u>You cannot restore <b>ANY</b> of this data once deleted! Choose what you want to delete wisely.</div>
+                <div style="margin-top: 1rem"><u><b>NOTE:</b></u>You cannot restore <b>ANY</b> of this data once deleted! Choose what you want to delete wisely.</div>
                 <div class="btn clear all-cache" title="Clear all cached data">Clear All Cached Data</div>
                 <div><u><b>NOTE:</b></u> This clears <u><b>EVERYTHING</b></u>, including your stored editor content, current theme, and all your uploaded themes!</div>
                 <div class="btn clear theme-cache" title="Clear cached theme data">Clear Cached Theme Data</div>
@@ -337,6 +342,8 @@ Unimplemented because language is not even in a workable condition!</div>
                 <div><u><b>NOTE:</b></u> This clears your stored editor content! You will see the default placeholder once you reload this page!</div>
                 <div class="btn clear db-cache" title="Clear database cache">Clear Storage Cache</div>
                 <div><u><b>NOTE:</b></u> This clears your cached storage mode (database 1 / 2 / encoded URL)!</div>
+                <div class="btn clear layout-cache" title="Clear layout cache">Clear Layout Cache</div>
+                <div><u><b>NOTE:</b></u> This clears your cached layout (vertical / horizontal)!</div>
                 <div class="btn clear settings-cache" title="Clear and reset settings">Reset Settings</div>
                 <div><u><b>NOTE:</b></u> This clears and resets all your settings!</div>
             </div>
