@@ -174,12 +174,17 @@ export class UI {
                         const percent = (parseFloat(opener_cs.width) + ox) * 100 / (bc.width ?? window.innerWidth);
                         document.documentElement
                             .style
-                            .setProperty('--tab-width',  percent + 'vw');
+                            .setProperty('--tab-width', this.window_small ?
+                                (parseFloat(opener_cs.width) + ox + 'px') :
+                                (percent + 'vw'));
                     } else if (main.classList.contains('vertical')) {
+
                         const percent = (parseFloat(opener_cs.height) + oy) * 100 / (bc.height ?? window.innerHeight);
                         document.documentElement
                             .style
-                            .setProperty('--tab-height', percent + 'vh');
+                            .setProperty('--tab-height', this.window_small ?
+                                (parseFloat(opener_cs.height) + oy + 'px') :
+                                (percent + 'vh'));
                     }
                     this.coords = { cx, cy };
                 }
